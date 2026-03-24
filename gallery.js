@@ -98,7 +98,7 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
 
   function animate() {
     if (snapTarget !== null && !isPointerDown) {
-      targetTranslate += (snapTarget - targetTranslate) * 0.14;
+      targetTranslate += (snapTarget - targetTranslate) * 0.18;
 
       if (Math.abs(snapTarget - targetTranslate) < 0.5) {
         targetTranslate = snapTarget;
@@ -108,7 +108,7 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
 
     targetTranslate = clamp(targetTranslate, 0, maxTranslate);
 
-    currentTranslate += (targetTranslate - currentTranslate) * 0.22;
+    currentTranslate += (targetTranslate - currentTranslate) * 0.24;
 
     if (Math.abs(targetTranslate - currentTranslate) < 0.01) {
       currentTranslate = targetTranslate;
@@ -131,14 +131,11 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     if (window.innerWidth <= 480) return;
     if (!isPointerDown) return;
 
-    const now = performance.now();
-    const dx = e.clientX - lastX;
-    lastTime = Math.max(now - lastTime, 1);
-
     if (Math.abs(e.clientX - startX) > 4) {
       hasDragged = true;
     }
 
+    const dx = e.clientX - lastX;
     targetTranslate = clamp(targetTranslate - dx, 0, maxTranslate);
 
     lastX = e.clientX;
@@ -158,14 +155,15 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     const x = e.touches[0].clientX;
     const dx = x - lastX;
 
-    targetTranslate = clamp(targetTranslate - dx * 1.35, 0, maxTranslate);
+    /* faster mobile swipe response */
+    targetTranslate = clamp(targetTranslate - dx * 1.65, 0, maxTranslate);
 
     lastX = x;
     lastTime = performance.now();
     snapTarget = null;
   }, { passive: true });
 
-  // ✅ Mobile release snaps nearest image center
+  // mobile release snaps nearest photo center
   gallery.addEventListener("touchend", () => {
     beginSnap();
   }, { passive: true });
