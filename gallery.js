@@ -9,6 +9,7 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
 
   let startX = 0;
   let lastX = 0;
+  let lastTime = 0;
 
   let currentTranslate = 0;
   let targetTranslate = 0;
@@ -86,14 +87,23 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     return bestIndex;
   }
 
-  function snapToSlide(index) {
+  function getSlideTranslate(index) {
     const centers = getSlideCenters();
     const galleryCenter = getGalleryCenter();
-    const totalSlides = slides.length;
-    const wrappedIndex = (index + totalSlides) % totalSlides;
-    const translateForCenter = centers[wrappedIndex] - galleryCenter;
+    const safeIndex = clamp(index, 0, slides.length - 1);
+    return clamp(centers[safeIndex] - galleryCenter, 0, maxTranslate);
+  }
 
-    snapTarget = clamp(translateForCenter, 0, maxTranslate);
+  function snapToSlide(index) {
+    snapTarget = getSlideTranslate(index);
+  }
+
+  function jumpToSlide(index) {
+    const finalTranslate = getSlideTranslate(index);
+    currentTranslate = finalTranslate;
+    targetTranslate = finalTranslate;
+    snapTarget = null;
+    track.style.transform = `translateX(${-finalTranslate}px)`;
   }
 
   function beginSnap() {
@@ -162,7 +172,6 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     clearDesktopCursor();
   });
 
-  // Desktop drag + cursor follow
   gallery.addEventListener("mousemove", (e) => {
     if (!isDesktop()) return;
 
@@ -182,45 +191,41 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     updateDesktopCursor(e);
   });
 
-  // Mobile touch
   gallery.addEventListener(
     "touchstart",
     (e) => {
       const x = e.touches[0].clientX;
       startX = x;
       lastX = x;
+      lastTime = performance.now();
       snapTarget = null;
     },
     { passive: true }
   );
 
-gallery.addEventListener(
-  "touchmove",
-  (e) => {
-    const x = e.touches[0].clientX;
-    const dx = x - lastX;
+  gallery.addEventListener(
+    "touchmove",
+    (e) => {
+      const x = e.touches[0].clientX;
+      const dx = x - lastX;
 
-    const now = performance.now();
-    const dt = now - (lastTime || now);
+      const now = performance.now();
+      const dt = now - (lastTime || now);
+      const velocity = dt > 0 ? dx / dt : 0;
+      const speedMultiplier = 4.6 + Math.abs(velocity) * 10;
 
-    // velocity (px per ms)
-    const velocity = dt > 0 ? dx / dt : 0;
+      targetTranslate = clamp(
+        targetTranslate - dx * speedMultiplier,
+        0,
+        maxTranslate
+      );
 
-    // base speed + velocity boost
-    const speedMultiplier = 4.6 + Math.abs(velocity) * 10;
-
-    targetTranslate = clamp(
-      targetTranslate - dx * speedMultiplier,
-      0,
-      maxTranslate
-    );
-
-    lastX = x;
-    lastTime = now;
-    snapTarget = null;
-  },
-  { passive: true }
-);
+      lastX = x;
+      lastTime = now;
+      snapTarget = null;
+    },
+    { passive: true }
+  );
 
   gallery.addEventListener(
     "touchend",
@@ -230,7 +235,6 @@ gallery.addEventListener(
     { passive: true }
   );
 
-  // Desktop drag / click
   gallery.addEventListener("mousedown", (e) => {
     if (!isDesktop()) return;
 
@@ -254,24 +258,21 @@ gallery.addEventListener(
       const x = e.clientX - rect.left;
       const centerX = rect.width / 2;
       const currentIndex = getCurrentSlideIndex();
-      const totalSlides = slides.length;
-
-      let nextIndex;
+      const lastIndex = slides.length - 1;
 
       if (x > centerX) {
-        nextIndex = (currentIndex + 1) % totalSlides;
+        if (currentIndex === lastIndex) {
+          jumpToSlide(0);
+        } else {
+          jumpToSlide(currentIndex + 1);
+        }
       } else {
-        nextIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+        if (currentIndex === 0) {
+          jumpToSlide(lastIndex);
+        } else {
+          jumpToSlide(currentIndex - 1);
+        }
       }
-
-      const centers = getSlideCenters();
-      const galleryCenter = getGalleryCenter();
-      const translateForCenter = centers[nextIndex] - galleryCenter;
-      const finalTranslate = clamp(translateForCenter, 0, maxTranslate);
-
-      targetTranslate = finalTranslate;
-      currentTranslate = finalTranslate;
-      snapTarget = null;
     } else {
       beginSnap();
     }
