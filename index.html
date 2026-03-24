@@ -116,13 +116,15 @@
       margin-top: 20px;
     }
 
-    h1:not(.title) {
-      margin: 0 0 18px;
-      font-size: clamp(34px, 5vw, 68px);
-      line-height: 0.94;
-      font-weight: 400;
-      letter-spacing: -0.05em;
+    h1.title {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: clamp(24px, 3.2vw, 40px);
+      font-weight: 300;
+      letter-spacing: 0.16em;
       text-transform: uppercase;
+      line-height: 0.95;
+      color: #111;
     }
 
     .meta {
@@ -142,9 +144,36 @@
       position: relative;
     }
 
-    .frame {
+    .gallery {
+      width: 100%;
+      overflow: hidden;
       position: relative;
-      width: fit-content;
+      cursor: grab;
+      touch-action: pan-y;
+    }
+
+    .gallery.is-dragging {
+      cursor: grabbing;
+    }
+
+    .gallery-track {
+      display: flex;
+      will-change: transform;
+      transition: transform 0.35s ease;
+    }
+
+    .gallery-track .frame {
+      flex: 0 0 100%;
+      width: 100%;
+      position: relative;
+      margin: 0 auto;
+    }
+
+    .gallery-track .frame img {
+      display: block;
+      width: 80%;
+      max-width: 860px;
+      height: auto;
       margin: 0 auto;
     }
 
@@ -153,9 +182,12 @@
       bottom: 0;
       left: 0;
       transform: translate(10px, -8px);
-      display: flex;
+      display: inline-flex;
       flex-direction: column;
       gap: 1px;
+      width: max-content;
+      text-align: right;
+      align-items: flex-start;
       color: #111;
       text-shadow: none;
       z-index: 2;
@@ -208,12 +240,24 @@
         width: 100%;
       }
 
-      .frame {
+      .gallery-track .frame {
         width: 100%;
       }
 
-      .caption {
-        transform: translate(12px, -10px);
+      .gallery-track .frame img {
+        width: 100%;
+        max-width: none;
+      }
+
+      .gallery-track .frame .caption {
+        position: relative !important;
+        bottom: auto !important;
+        left: auto !important;
+        transform: none !important;
+        display: block !important;
+        width: 100% !important;
+        margin-top: 8px;
+        text-align: right;
         font-size: 9px;
       }
 
@@ -245,137 +289,167 @@
       </div>
     </section>
 
-   <section id="archive">
-  <div class="archive-head">
-    <div class="section-label">Archive</div>
-  </div>
+    <section id="archive">
+      <div class="archive-head">
+        <div class="section-label">Archive</div>
+      </div>
 
-  <div class="gallery" id="photoGallery">
-    <div class="gallery-track">
+      <div class="archive-grid">
 
-      <article class="item">
-        <div class="frame">
-          <img
-            src="images/mom2.jpg"
-            alt="California"
-            loading="lazy"
-            decoding="async"
-          />
-          <div class="caption">
-            <span class="cap-title">California</span>
-            <span class="cap-meta">Document</span>
+        <article class="item">
+          <div class="gallery">
+            <div class="gallery-track">
+              <div class="frame">
+                <img
+                  src="images/mom2.jpg"
+                  alt="California"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <div class="caption">
+                  <span class="cap-title">California</span>
+                  <span class="cap-meta">Document</span>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      </article>
+        </article>
 
-      <article class="item">
-        <div class="frame">
-          <img
-            src="images/divecanal2.jpg"
-            alt="Dive"
-            loading="lazy"
-            decoding="async"
-          />
-          <div class="caption">
-            <span class="cap-title">Paris</span>
-            <span class="cap-meta">2025</span>
+        <article class="item">
+          <div class="gallery">
+            <div class="gallery-track">
+              <div class="frame">
+                <img
+                  src="images/divecanal2.jpg"
+                  alt="Dive"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <div class="caption">
+                  <span class="cap-title">Paris</span>
+                  <span class="cap-meta">2025</span>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      </article>
+        </article>
 
-      <article class="item">
-        <div class="frame">
-          <img
-            src="images/bikekid2.jpg"
-            alt="Dimessq"
-            loading="lazy"
-            decoding="async"
-          />
-          <div class="caption">
-            <span class="cap-title">New York</span>
-            <span class="cap-meta">2023</span>
+        <article class="item">
+          <div class="gallery">
+            <div class="gallery-track">
+              <div class="frame">
+                <img
+                  src="images/bikekid2.jpg"
+                  alt="Dimessq"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <div class="caption">
+                  <span class="cap-title">New York</span>
+                  <span class="cap-meta">2023</span>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      </article>
+        </article>
 
-      <article class="item">
-        <div class="frame">
-          <img
-            src="images/chio2.jpg"
-            alt="Chiomato"
-            loading="lazy"
-            decoding="async"
-          />
-          <div class="caption">
-            <span class="cap-title">Chiomato</span>
+        <article class="item">
+          <div class="gallery">
+            <div class="gallery-track">
+              <div class="frame">
+                <img
+                  src="images/chio2.jpg"
+                  alt="Chiomato"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <div class="caption">
+                  <span class="cap-title">Chiomato</span>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      </article>
+        </article>
 
-      <article class="item">
-        <div class="frame">
-          <img
-            src="images/brothers2.jpg"
-            alt="Brothers"
-            loading="lazy"
-            decoding="async"
-          />
-          <div class="caption">
-            <span class="cap-title">Brothers</span>
-            <span class="cap-meta">Heritage</span>
+        <article class="item">
+          <div class="gallery">
+            <div class="gallery-track">
+              <div class="frame">
+                <img
+                  src="images/brothers2.jpg"
+                  alt="Brothers"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <div class="caption">
+                  <span class="cap-title">Brothers</span>
+                  <span class="cap-meta">Heritage</span>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      </article>
+        </article>
 
-      <article class="item">
-        <div class="frame">
-          <img
-            src="images/brendan2.jpg"
-            alt="Brendan"
-            loading="lazy"
-            decoding="async"
-          />
-          <div class="caption">
-            <span class="cap-title">Brendan</span>
-            <span class="cap-meta">2006</span>
+        <article class="item">
+          <div class="gallery">
+            <div class="gallery-track">
+              <div class="frame">
+                <img
+                  src="images/brendan2.jpg"
+                  alt="Brendan"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <div class="caption">
+                  <span class="cap-title">Brendan</span>
+                  <span class="cap-meta">2006</span>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      </article>
+        </article>
 
-      <article class="item">
-        <div class="frame">
-          <img
-            src="images/ella2.jpg"
-            alt="Greece"
-            loading="lazy"
-            decoding="async"
-          />
-          <div class="caption">
-            <span class="cap-title">Greece</span>
-            <span class="cap-meta">2022</span>
+        <article class="item">
+          <div class="gallery">
+            <div class="gallery-track">
+              <div class="frame">
+                <img
+                  src="images/ella2.jpg"
+                  alt="Greece"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <div class="caption">
+                  <span class="cap-title">Greece</span>
+                  <span class="cap-meta">2022</span>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      </article>
+        </article>
 
-      <article class="item">
-        <div class="frame">
-          <img
-            src="images/sunflower.jpg"
-            alt="Sunflower"
-            loading="lazy"
-            decoding="async"
-          />
-          <div class="caption">
-            <span class="cap-title">Église</span>
-            <span class="cap-meta">2022</span>
+        <article class="item">
+          <div class="gallery">
+            <div class="gallery-track">
+              <div class="frame">
+                <img
+                  src="images/sunflower.jpg"
+                  alt="Sunflower"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <div class="caption">
+                  <span class="cap-title">Église</span>
+                  <span class="cap-meta">2022</span>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      </article>
+        </article>
 
-    </div>
-  </div>
-</section>
-    
+      </div>
+    </section>
+
     <section id="info" class="info">
       <div>
         <div class="section-label">Info</div>
@@ -392,5 +466,101 @@
       <span>Archive 01</span>
     </footer>
   </div>
+
+  <script>
+    document.querySelectorAll(".gallery").forEach((gallery) => {
+      const track = gallery.querySelector(".gallery-track");
+      const slides = Array.from(track.querySelectorAll(".frame"));
+
+      if (slides.length <= 1) return;
+
+      let index = 0;
+      let startX = 0;
+      let currentX = 0;
+      let isPointerDown = false;
+
+      function clampIndex(i) {
+        return Math.max(0, Math.min(i, slides.length - 1));
+      }
+
+      function updateGallery(animated = true) {
+        track.style.transition = animated ? "transform 0.35s ease" : "none";
+        track.style.transform = `translateX(-${index * 100}%)`;
+      }
+
+      function goToSlide(i) {
+        index = clampIndex(i);
+        updateGallery(true);
+      }
+
+      function nextSlide() {
+        goToSlide(index + 1);
+      }
+
+      function prevSlide() {
+        goToSlide(index - 1);
+      }
+
+      function isMobile() {
+        return window.matchMedia("(max-width: 480px)").matches;
+      }
+
+      gallery.addEventListener("touchstart", (e) => {
+        startX = e.touches[0].clientX;
+        currentX = startX;
+      }, { passive: true });
+
+      gallery.addEventListener("touchmove", (e) => {
+        currentX = e.touches[0].clientX;
+      }, { passive: true });
+
+      gallery.addEventListener("touchend", () => {
+        const diff = currentX - startX;
+        if (diff < -50) nextSlide();
+        if (diff > 50) prevSlide();
+      });
+
+      gallery.addEventListener("wheel", (e) => {
+        if (isMobile()) return;
+        e.preventDefault();
+
+        if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
+          if (e.deltaX > 0) nextSlide();
+          else prevSlide();
+        } else {
+          if (e.deltaY > 0) nextSlide();
+          else prevSlide();
+        }
+      }, { passive: false });
+
+      gallery.addEventListener("mousedown", (e) => {
+        if (isMobile()) return;
+        isPointerDown = true;
+        startX = e.clientX;
+        currentX = startX;
+        gallery.classList.add("is-dragging");
+        updateGallery(false);
+      });
+
+      window.addEventListener("mousemove", (e) => {
+        if (!isPointerDown || isMobile()) return;
+        currentX = e.clientX;
+      });
+
+      window.addEventListener("mouseup", () => {
+        if (!isPointerDown || isMobile()) return;
+
+        const diff = currentX - startX;
+        isPointerDown = false;
+        gallery.classList.remove("is-dragging");
+
+        if (diff < -60) nextSlide();
+        else if (diff > 60) prevSlide();
+        else updateGallery(true);
+      });
+
+      updateGallery();
+    });
+  </script>
 </body>
 </html>
