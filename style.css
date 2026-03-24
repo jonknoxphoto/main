@@ -54,6 +54,9 @@ h1.title {
     text-align: right;
     align-items: flex-end;
   }
+  .archive-grid {
+  display: block;
+}
 }
 .gallery {
   width: 100%;
