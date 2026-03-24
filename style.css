@@ -38,16 +38,20 @@ h1.title {
   pointer-events: none;
 }
 @media (max-width: 480px) {
-  .caption {
-    position: static;   /* key change */
-    transform: none;    /* remove overlay offset */
-
-    margin-top: 8px;
-    text-align: right;  /* keeps your right-justified look */
-  }
-}
-@media (max-width: 480px) {
-  .frame {
+  .archive-grid .frame {
     display: block;
+  }
+
+  .archive-grid .frame .caption {
+    position: relative !important;
+    bottom: auto !important;
+    left: auto !important;
+    transform: none !important;
+
+    display: flex !important;
+    width: 100% !important;
+    margin-top: 8px;
+    text-align: right;
+    align-items: flex-end;
   }
 }
