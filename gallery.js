@@ -14,7 +14,6 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   let currentTranslate = 0;
   let targetTranslate = 0;
   let maxTranslate = 0;
-  let velocity = 0;
   let snapTarget = null;
 
   function clamp(value, min, max) {
@@ -64,26 +63,17 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   }
 
   function animate() {
-    if (!isPointerDown && !isHovering) {
-      targetTranslate += velocity;
-      velocity *= 0.92;
+    if (snapTarget !== null && !isPointerDown && !isHovering) {
+      targetTranslate += (snapTarget - targetTranslate) * 0.12;
 
-      if (Math.abs(velocity) < 0.02) velocity = 0;
-
-      if (snapTarget !== null) {
-        const snapPull = (snapTarget - targetTranslate) * 0.08;
-        targetTranslate += snapPull;
-
-        if (Math.abs(snapTarget - targetTranslate) < 0.5 && Math.abs(velocity) < 0.05) {
-          targetTranslate = snapTarget;
-          snapTarget = null;
-        }
+      if (Math.abs(snapTarget - targetTranslate) < 0.5) {
+        targetTranslate = snapTarget;
+        snapTarget = null;
       }
     }
 
     targetTranslate = clamp(targetTranslate, 0, maxTranslate);
 
-    // Slightly tighter response, closer to Instagram
     currentTranslate += (targetTranslate - currentTranslate) * 0.22;
 
     if (Math.abs(targetTranslate - currentTranslate) < 0.01) {
@@ -111,7 +101,6 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     if (window.innerWidth <= 480) return;
     isHovering = true;
     snapTarget = null;
-    velocity = 0;
   });
 
   gallery.addEventListener("mouseleave", () => {
@@ -130,9 +119,6 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
 
       targetTranslate = clamp(targetTranslate - dx, 0, maxTranslate);
 
-      // Lower multiplier = more controlled, Instagram-like
-      velocity = (-dx / dt) * 7;
-
       lastX = e.clientX;
       lastTime = now;
       snapTarget = null;
@@ -146,7 +132,6 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     const percent = clamp(x / rect.width, 0, 1);
 
     targetTranslate = percent * maxTranslate;
-    velocity = 0;
     snapTarget = null;
   });
 
@@ -156,7 +141,6 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     startX = x;
     lastX = x;
     lastTime = performance.now();
-    velocity = 0;
     snapTarget = null;
   }, { passive: true });
 
@@ -168,11 +152,9 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
 
     targetTranslate = clamp(targetTranslate - dx, 0, maxTranslate);
 
-    // Slightly faster on touch for phone feel
-    velocity = (-dx / dt) * 8.5;
-
     lastX = x;
     lastTime = now;
+    snapTarget = null;
   }, { passive: true });
 
   gallery.addEventListener("touchend", () => {
@@ -187,7 +169,6 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     startX = e.clientX;
     lastX = e.clientX;
     lastTime = performance.now();
-    velocity = 0;
     snapTarget = null;
     gallery.classList.add("is-dragging");
   });
