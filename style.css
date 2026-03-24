@@ -9,8 +9,13 @@ h1.title {
   color: #111; /* ← change from red to black */
 }
 @media (max-width: 480px) {
-  .frame {
-    position: relative;
+  .page {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .archive-grid img {
+    width: 100%;
   }
 }
 .archive-grid .item:last-child img {
