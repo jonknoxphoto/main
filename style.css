@@ -37,3 +37,12 @@ h1.title {
   z-index: 2;
   pointer-events: none;
 }
+@media (max-width: 480px) {
+  .caption {
+    position: static;   /* key change */
+    transform: none;    /* remove overlay offset */
+
+    margin-top: 8px;
+    text-align: right;  /* keeps your right-justified look */
+  }
+}
