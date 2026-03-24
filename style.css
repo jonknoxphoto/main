@@ -3,7 +3,7 @@ h1.title {
   font-size: clamp(28px, 4vw, 56px);
   font-weight: 100;
   letter-spacing: 0.18em;
-  text-transform: uppercase;
+  text-transform: lowercase;
   margin: 0;
   line-height: 1;
 }
