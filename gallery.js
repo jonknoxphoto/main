@@ -191,41 +191,49 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     updateDesktopCursor(e);
   });
 
-  gallery.addEventListener(
-    "touchstart",
-    (e) => {
-      const x = e.touches[0].clientX;
-      startX = x;
-      lastX = x;
-      lastTime = performance.now();
-      snapTarget = null;
-    },
-    { passive: true }
-  );
+// Mobile touch (controlled + accurate)
+gallery.addEventListener(
+  "touchstart",
+  (e) => {
+    const x = e.touches[0].clientX;
+    startX = x;
+    lastX = x;
+    lastTime = performance.now();
+    snapTarget = null;
+  },
+  { passive: true }
+);
 
-  gallery.addEventListener(
-    "touchmove",
-    (e) => {
-      const x = e.touches[0].clientX;
-      const dx = x - lastX;
+gallery.addEventListener(
+  "touchmove",
+  (e) => {
+    const x = e.touches[0].clientX;
+    const dx = x - lastX;
 
-      const now = performance.now();
-      const dt = now - (lastTime || now);
-      const velocity = dt > 0 ? dx / dt : 0;
-      const speedMultiplier = 4.6 + Math.abs(velocity) * 10;
+    const now = performance.now();
+    const dt = now - (lastTime || now);
 
-      targetTranslate = clamp(
-        targetTranslate - dx * speedMultiplier,
-        0,
-        maxTranslate
-      );
+    // velocity (px/ms)
+    const velocity = dt > 0 ? dx / dt : 0;
 
-      lastX = x;
-      lastTime = now;
-      snapTarget = null;
-    },
-    { passive: true }
-  );
+    // capped velocity boost (prevents flying across all slides)
+    const velocityBoost = Math.min(Math.abs(velocity) * 1.2, 1.1);
+
+    // balanced multiplier (precise but still responsive)
+    const speedMultiplier = 1.35 + velocityBoost;
+
+    targetTranslate = clamp(
+      targetTranslate - dx * speedMultiplier,
+      0,
+      maxTranslate
+    );
+
+    lastX = x;
+    lastTime = now;
+    snapTarget = null;
+  },
+  { passive: true }
+);
 
   gallery.addEventListener(
     "touchend",
