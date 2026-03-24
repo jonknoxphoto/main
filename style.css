@@ -13,3 +13,6 @@ h1.title {
     position: relative;
   }
 }
+.archive-grid .item:last-child img {
+  margin-bottom: 20px;
+}
