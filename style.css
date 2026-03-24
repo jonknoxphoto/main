@@ -9,58 +9,26 @@ h1.title {
   color: #111;
 }
 
-@media (max-width: 480px) {
-  .page {
-    padding-left: 20px;
-    padding-right: 20px;
-  }
-
-  .archive-grid img {
-    width: 100%;
-  }
-}
-
 .caption {
   position: absolute;
   bottom: 0;
   left: 0;
   transform: translate(10px, -8px);
-
   display: inline-flex;
   flex-direction: column;
   gap: 1px;
-
   text-align: right;
   align-items: flex-start;
   width: max-content;
-
   color: #111;
   text-shadow: none;
   z-index: 2;
   pointer-events: none;
 }
 
-@media (max-width: 480px) {
-  .archive-grid .frame {
-    display: block;
-  }
-
-  .archive-grid .frame .caption {
-    position: relative !important;
-    bottom: auto !important;
-    left: auto !important;
-    transform: none !important;
-
-    display: flex !important;
-    width: 100% !important;
-    margin-top: 8px;
-    text-align: right;
-    align-items: flex-end;
-  }
-
-  .archive-grid {
-    display: block;
-  }
+.archive-grid {
+  display: grid;
+  gap: 26px;
 }
 
 .gallery {
@@ -77,42 +45,41 @@ h1.title {
 
 .gallery-track {
   display: flex;
+  align-items: center;
+  gap: 20px;
   will-change: transform;
   transition: transform 0.35s ease;
 }
 
-/* ✅ spacing between images */
 .gallery-track .frame {
   flex: 0 0 100%;
+  width: 100%;
   position: relative;
-  width: fit-content;
-  margin: 0 auto;
-  padding-right: 20px;
-}
-
-/* remove space on last image */
-.gallery-track .frame:last-child {
-  padding-right: 0;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .gallery .item {
-  flex: 0 0 100%;
   width: 100%;
 }
 
 .gallery .frame img {
   display: block;
-  width: 80%;
-  max-width: 860px;
-  height: auto;
+  width: auto;
+  height: 70vh;
+  max-width: 100%;
+  max-height: 70vh;
   margin: 0 auto;
+  object-fit: contain;
 }
 
 .gallery .caption {
   position: absolute;
   bottom: 0;
-  left: 0;
-  transform: translate(10px, -8px);
+  left: 50%;
+  transform: translate(calc(-40% + 10px), -8px);
   display: inline-flex;
   flex-direction: column;
   gap: 1px;
@@ -126,23 +93,45 @@ h1.title {
 }
 
 @media (max-width: 480px) {
-  .gallery .frame {
+  .page {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .archive-grid {
+    display: block;
+  }
+
+  .archive-grid img {
     width: 100%;
   }
 
-  .gallery .frame img {
-    width: 100%;
-    max-width: none;
+  .archive-grid .frame {
+    display: block;
   }
 
+  .archive-grid .frame .caption,
   .gallery .frame .caption {
     position: relative !important;
     bottom: auto !important;
     left: auto !important;
     transform: none !important;
-    display: block !important;
+    display: flex !important;
     width: 100% !important;
     margin-top: 8px;
     text-align: right;
+    align-items: flex-end;
+  }
+
+  .gallery .frame {
+    width: 100%;
+    display: block;
+  }
+
+  .gallery .frame img {
+    width: 100%;
+    height: auto;
+    max-width: none;
+    max-height: none;
   }
 }
