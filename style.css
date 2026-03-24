@@ -6,8 +6,9 @@ h1.title {
   letter-spacing: 0.16em;
   text-transform: uppercase;
   line-height: 0.95;
-  color: #111; /* ← change from red to black */
+  color: #111;
 }
+
 @media (max-width: 480px) {
   .page {
     padding-left: 20px;
@@ -18,6 +19,7 @@ h1.title {
     width: 100%;
   }
 }
+
 .caption {
   position: absolute;
   bottom: 0;
@@ -37,6 +39,7 @@ h1.title {
   z-index: 2;
   pointer-events: none;
 }
+
 @media (max-width: 480px) {
   .archive-grid .frame {
     display: block;
@@ -54,10 +57,12 @@ h1.title {
     text-align: right;
     align-items: flex-end;
   }
+
   .archive-grid {
-  display: block;
+    display: block;
+  }
 }
-}
+
 .gallery {
   width: 100%;
   overflow: hidden;
@@ -76,15 +81,23 @@ h1.title {
   transition: transform 0.35s ease;
 }
 
-.gallery .item {
+/* ✅ spacing between images */
+.gallery-track .frame {
   flex: 0 0 100%;
-  width: 100%;
-}
-
-.gallery .frame {
   position: relative;
   width: fit-content;
   margin: 0 auto;
+  padding-right: 20px;
+}
+
+/* remove space on last image */
+.gallery-track .frame:last-child {
+  padding-right: 0;
+}
+
+.gallery .item {
+  flex: 0 0 100%;
+  width: 100%;
 }
 
 .gallery .frame img {
