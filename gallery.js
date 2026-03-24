@@ -180,28 +180,40 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     gallery.classList.add("is-dragging");
   });
 
-  window.addEventListener("mouseup", (e) => {
-    if (!isPointerDown) return;
+window.addEventListener("mouseup", (e) => {
+  if (!isPointerDown) return;
 
-    isPointerDown = false;
-    gallery.classList.remove("is-dragging");
+  isPointerDown = false;
+  gallery.classList.remove("is-dragging");
 
-    if (!hasDragged && window.innerWidth > 480) {
-      const rect = gallery.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const centerX = rect.width / 2;
-      const currentIndex = getCurrentSlideIndex();
-      const totalSlides = slides.length;
+  if (!hasDragged && window.innerWidth > 480) {
+    const rect = gallery.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const centerX = rect.width / 2;
+    const currentIndex = getCurrentSlideIndex();
+    const totalSlides = slides.length;
 
-      if (x > centerX) {
-        snapToSlide((currentIndex + 1) % totalSlides);
-      } else {
-        snapToSlide((currentIndex - 1 + totalSlides) % totalSlides);
-      }
+    let nextIndex;
+
+    if (x > centerX) {
+      nextIndex = (currentIndex + 1) % totalSlides;
     } else {
-      beginSnap();
+      nextIndex = (currentIndex - 1 + totalSlides) % totalSlides;
     }
-  });
+
+    // 👇 instant jump (no easing)
+    const centers = getSlideCenters();
+    const galleryCenter = getGalleryCenter();
+    const translateForCenter = centers[nextIndex] - galleryCenter;
+    const finalTranslate = clamp(translateForCenter, 0, maxTranslate);
+
+    targetTranslate = finalTranslate;
+    currentTranslate = finalTranslate;
+    snapTarget = null;
+  } else {
+    beginSnap();
+  }
+});
 
   gallery.addEventListener("dragstart", (e) => {
     e.preventDefault();
