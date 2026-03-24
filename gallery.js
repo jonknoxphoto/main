@@ -2,32 +2,33 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   const track = gallery.querySelector(".gallery-track");
   const slides = Array.from(track.querySelectorAll(".frame"));
 
-  if (slides.length <= 1) return;
+  if (!track || slides.length <= 1) return;
 
   let isPointerDown = false;
   let hasDragged = false;
 
   let startX = 0;
   let lastX = 0;
-  let lastTime = 0;
   let touchDirection = 0;
 
+  let currentIndex = 0;
   let currentTranslate = 0;
   let targetTranslate = 0;
-  let maxTranslate = 0;
-  let snapTarget = null;
-  let skipLerpFrame = false;
-
-  function clamp(value, min, max) {
-    return Math.max(min, Math.min(value, max));
-  }
 
   function isDesktop() {
     return window.innerWidth > 480;
   }
 
+  function clamp(value, min, max) {
+    return Math.max(min, Math.min(value, max));
+  }
+
   function getGalleryCenter() {
     return gallery.clientWidth / 2;
+  }
+
+  function getMaxTranslate() {
+    return Math.max(0, track.scrollWidth - gallery.clientWidth);
   }
 
   function getSlideCenters() {
@@ -41,78 +42,61 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     });
   }
 
-  function updateBounds() {
-    maxTranslate = Math.max(0, track.scrollWidth - gallery.clientWidth);
-    currentTranslate = clamp(currentTranslate, 0, maxTranslate);
-    targetTranslate = clamp(targetTranslate, 0, maxTranslate);
-  }
-
-  function getNearestCenterSnap(rawTranslate) {
-    const galleryCenter = getGalleryCenter();
-    const centers = getSlideCenters();
-
-    let best = 0;
-    let smallestDistance = Infinity;
-
-    centers.forEach((center) => {
-      const translateForCenter = center - galleryCenter;
-      const clamped = clamp(translateForCenter, 0, maxTranslate);
-      const distance = Math.abs(clamped - rawTranslate);
-
-      if (distance < smallestDistance) {
-        smallestDistance = distance;
-        best = clamped;
-      }
-    });
-
-    return best;
-  }
-
-  function getCurrentSlideIndex() {
-    const snapped = getNearestCenterSnap(targetTranslate);
-    const galleryCenter = getGalleryCenter();
-    const centers = getSlideCenters();
-
-    let bestIndex = 0;
-    let smallestDistance = Infinity;
-
-    centers.forEach((center, index) => {
-      const translateForCenter = clamp(center - galleryCenter, 0, maxTranslate);
-      const distance = Math.abs(translateForCenter - snapped);
-
-      if (distance < smallestDistance) {
-        smallestDistance = distance;
-        bestIndex = index;
-      }
-    });
-
-    return bestIndex;
-  }
-
   function getSlideTranslate(index) {
     const centers = getSlideCenters();
     const galleryCenter = getGalleryCenter();
     const safeIndex = clamp(index, 0, slides.length - 1);
-    return clamp(centers[safeIndex] - galleryCenter, 0, maxTranslate);
+    const rawTranslate = centers[safeIndex] - galleryCenter;
+    return clamp(rawTranslate, 0, getMaxTranslate());
   }
 
-  function snapToSlide(index) {
-    snapTarget = getSlideTranslate(index);
+  function applyTransform() {
+    track.style.transform = `translateX(${-currentTranslate}px)`;
   }
 
   function jumpToSlide(index) {
-    const finalTranslate = getSlideTranslate(index);
-
-    currentTranslate = finalTranslate;
-    targetTranslate = finalTranslate;
-    snapTarget = null;
-    skipLerpFrame = true;
-
-    track.style.transform = `translateX(${-finalTranslate}px)`;
+    currentIndex = clamp(index, 0, slides.length - 1);
+    const translate = getSlideTranslate(currentIndex);
+    currentTranslate = translate;
+    targetTranslate = translate;
+    applyTransform();
   }
 
-  function beginSnap() {
-    snapTarget = getNearestCenterSnap(targetTranslate);
+  function animateToSlide(index) {
+    currentIndex = clamp(index, 0, slides.length - 1);
+    targetTranslate = getSlideTranslate(currentIndex);
+  }
+
+  function goNextInstant() {
+    if (currentIndex === slides.length - 1) {
+      jumpToSlide(0);
+    } else {
+      jumpToSlide(currentIndex + 1);
+    }
+  }
+
+  function goPrevInstant() {
+    if (currentIndex === 0) {
+      jumpToSlide(slides.length - 1);
+    } else {
+      jumpToSlide(currentIndex - 1);
+    }
+  }
+
+  function goNextAnimated() {
+    if (currentIndex === slides.length - 1) {
+      jumpToSlide(0);
+    } else {
+      animateToSlide(currentIndex + 1);
+    }
+  }
+
+  function goPrevAnimated() {
+    if (currentIndex === 0) {
+      jumpToSlide(slides.length - 1);
+    } else {
+      animateToSlide(currentIndex - 1);
+    }
   }
 
   function updateDesktopCursor(e) {
@@ -135,40 +119,21 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   }
 
   function animate() {
-    if (skipLerpFrame) {
-      track.style.transform = `translateX(${-currentTranslate}px)`;
-      skipLerpFrame = false;
-      requestAnimationFrame(animate);
-      return;
-    }
-
-    if (snapTarget !== null && !isPointerDown) {
-      targetTranslate += (snapTarget - targetTranslate) * 0.18;
-
-      if (Math.abs(snapTarget - targetTranslate) < 0.5) {
-        targetTranslate = snapTarget;
-        snapTarget = null;
-      }
-    }
-
-    targetTranslate = clamp(targetTranslate, 0, maxTranslate);
-
     currentTranslate += (targetTranslate - currentTranslate) * 0.24;
 
     if (Math.abs(targetTranslate - currentTranslate) < 0.01) {
       currentTranslate = targetTranslate;
     }
 
-    track.style.transform = `translateX(${-currentTranslate}px)`;
+    applyTransform();
     requestAnimationFrame(animate);
   }
 
-  updateBounds();
+  jumpToSlide(0);
   animate();
 
   window.addEventListener("resize", () => {
-    updateBounds();
-    beginSnap();
+    jumpToSlide(currentIndex);
 
     if (!isDesktop()) {
       clearDesktopCursor();
@@ -191,12 +156,6 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
       if (Math.abs(e.clientX - startX) > 4) {
         hasDragged = true;
       }
-
-      const dx = e.clientX - lastX;
-      targetTranslate = clamp(targetTranslate - dx, 0, maxTranslate);
-
-      lastX = e.clientX;
-      snapTarget = null;
       return;
     }
 
@@ -209,9 +168,7 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
       const x = e.touches[0].clientX;
       startX = x;
       lastX = x;
-      lastTime = performance.now();
       touchDirection = 0;
-      snapTarget = null;
     },
     { passive: true }
   );
@@ -222,26 +179,11 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
       const x = e.touches[0].clientX;
       const dx = x - lastX;
 
-      const now = performance.now();
-      const dt = now - (lastTime || now);
-
-      const velocity = dt > 0 ? dx / dt : 0;
-      const velocityBoost = Math.min(Math.abs(velocity) * 1.2, 1.1);
-      const speedMultiplier = 1.35 + velocityBoost;
-
-      targetTranslate = clamp(
-        targetTranslate - dx * speedMultiplier,
-        0,
-        maxTranslate
-      );
-
       if (dx !== 0) {
         touchDirection = dx;
       }
 
       lastX = x;
-      lastTime = now;
-      snapTarget = null;
     },
     { passive: true }
   );
@@ -249,20 +191,19 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   gallery.addEventListener(
     "touchend",
     () => {
-      const currentIndex = getCurrentSlideIndex();
-      const lastIndex = slides.length - 1;
+      const swipeDistance = lastX - startX;
 
-      if (currentIndex === lastIndex && touchDirection < 0) {
-        jumpToSlide(0);
-        return;
+      if (swipeDistance < -20) {
+        goNextInstant();
+      } else if (swipeDistance > 20) {
+        goPrevInstant();
+      } else if (touchDirection < 0) {
+        goNextInstant();
+      } else if (touchDirection > 0) {
+        goPrevInstant();
+      } else {
+        jumpToSlide(currentIndex);
       }
-
-      if (currentIndex === 0 && touchDirection > 0) {
-        jumpToSlide(lastIndex);
-        return;
-      }
-
-      beginSnap();
     },
     { passive: true }
   );
@@ -274,7 +215,6 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     hasDragged = false;
     startX = e.clientX;
     lastX = e.clientX;
-    snapTarget = null;
     gallery.classList.add("is-dragging");
     clearDesktopCursor();
   });
@@ -285,28 +225,24 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     isPointerDown = false;
     gallery.classList.remove("is-dragging");
 
+    const dx = e.clientX - startX;
+
     if (!hasDragged && isDesktop()) {
       const rect = gallery.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const centerX = rect.width / 2;
-      const currentIndex = getCurrentSlideIndex();
-      const lastIndex = slides.length - 1;
 
       if (x > centerX) {
-        if (currentIndex === lastIndex) {
-          jumpToSlide(0);
-        } else {
-          jumpToSlide(currentIndex + 1);
-        }
+        goNextInstant();
       } else {
-        if (currentIndex === 0) {
-          jumpToSlide(lastIndex);
-        } else {
-          jumpToSlide(currentIndex - 1);
-        }
+        goPrevInstant();
       }
+    } else if (dx < -20) {
+      goNextAnimated();
+    } else if (dx > 20) {
+      goPrevAnimated();
     } else {
-      beginSnap();
+      jumpToSlide(currentIndex);
     }
 
     if (isDesktop()) {
