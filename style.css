@@ -18,17 +18,22 @@ h1.title {
     width: 100%;
   }
 }
-@media (max-width: 480px) {
-  .caption {
-    position: static;          /* removes overlay */
-    transform: none;
-    margin-top: 6px;
+.caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  transform: translate(10px, -8px);
 
-    color: #111;
-    text-shadow: none;
-  }
+  display: inline-flex;
+  flex-direction: column;
+  gap: 1px;
 
-  .frame {
-    display: block;
-  }
+  text-align: right;
+  align-items: flex-start;
+  width: max-content;
+
+  color: #111;
+  text-shadow: none;
+  z-index: 2;
+  pointer-events: none;
 }
