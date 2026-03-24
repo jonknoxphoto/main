@@ -4,80 +4,138 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
 
   if (slides.length <= 1) return;
 
-  let isDown = false;
+  let isPointerDown = false;
   let isHovering = false;
+
   let startX = 0;
   let lastX = 0;
   let lastTime = 0;
-
-  let touchStartX = 0;
-  let touchLastX = 0;
-  let touchLastTime = 0;
 
   let currentTranslate = 0;
   let targetTranslate = 0;
   let maxTranslate = 0;
   let velocity = 0;
+  let snapTarget = null;
 
   function clamp(value, min, max) {
     return Math.max(min, Math.min(value, max));
   }
 
-  function updateBounds() {
-    maxTranslate = track.scrollWidth - gallery.offsetWidth;
-    if (maxTranslate < 0) maxTranslate = 0;
+  function getGalleryCenter() {
+    return gallery.clientWidth / 2;
+  }
 
+  function getSlideCenters() {
+    const gap = parseFloat(getComputedStyle(track).gap || "0");
+    let offset = 0;
+
+    return slides.map((slide) => {
+      const center = offset + slide.offsetWidth / 2;
+      offset += slide.offsetWidth + gap;
+      return center;
+    });
+  }
+
+  function updateBounds() {
+    maxTranslate = Math.max(0, track.scrollWidth - gallery.clientWidth);
     currentTranslate = clamp(currentTranslate, 0, maxTranslate);
     targetTranslate = clamp(targetTranslate, 0, maxTranslate);
   }
 
+  function getNearestCenterSnap(rawTranslate) {
+    const galleryCenter = getGalleryCenter();
+    const centers = getSlideCenters();
+
+    let best = 0;
+    let smallestDistance = Infinity;
+
+    centers.forEach((center) => {
+      const translateForCenter = center - galleryCenter;
+      const clamped = clamp(translateForCenter, 0, maxTranslate);
+      const distance = Math.abs(clamped - rawTranslate);
+
+      if (distance < smallestDistance) {
+        smallestDistance = distance;
+        best = clamped;
+      }
+    });
+
+    return best;
+  }
+
   function animate() {
-    if (!isDown) {
+    if (!isPointerDown && !isHovering) {
       targetTranslate += velocity;
       velocity *= 0.92;
 
-      if (Math.abs(velocity) < 0.02) {
-        velocity = 0;
+      if (Math.abs(velocity) < 0.02) velocity = 0;
+
+      if (snapTarget !== null) {
+        const snapPull = (snapTarget - targetTranslate) * 0.08;
+        targetTranslate += snapPull;
+
+        if (Math.abs(snapTarget - targetTranslate) < 0.5 && Math.abs(velocity) < 0.05) {
+          targetTranslate = snapTarget;
+          snapTarget = null;
+        }
       }
     }
 
     targetTranslate = clamp(targetTranslate, 0, maxTranslate);
 
-    currentTranslate += (targetTranslate - currentTranslate) * 0.18;
-    track.style.transform = `translateX(${-currentTranslate}px)`;
+    // Slightly tighter response, closer to Instagram
+    currentTranslate += (targetTranslate - currentTranslate) * 0.22;
 
+    if (Math.abs(targetTranslate - currentTranslate) < 0.01) {
+      currentTranslate = targetTranslate;
+    }
+
+    track.style.transform = `translateX(${-currentTranslate}px)`;
     requestAnimationFrame(animate);
+  }
+
+  function beginSnap() {
+    snapTarget = getNearestCenterSnap(targetTranslate);
   }
 
   updateBounds();
   animate();
 
-  window.addEventListener("resize", updateBounds);
+  window.addEventListener("resize", () => {
+    updateBounds();
+    beginSnap();
+  });
 
-  // desktop hover scrub
+  // Desktop hover scrub
   gallery.addEventListener("mouseenter", () => {
     if (window.innerWidth <= 480) return;
     isHovering = true;
+    snapTarget = null;
+    velocity = 0;
   });
 
   gallery.addEventListener("mouseleave", () => {
+    if (window.innerWidth <= 480) return;
     isHovering = false;
+    beginSnap();
   });
 
   gallery.addEventListener("mousemove", (e) => {
     if (window.innerWidth <= 480) return;
 
-    if (isDown) {
+    if (isPointerDown) {
       const now = performance.now();
       const dx = e.clientX - lastX;
       const dt = Math.max(now - lastTime, 1);
 
       targetTranslate = clamp(targetTranslate - dx, 0, maxTranslate);
 
-      velocity = (-dx / dt) * 12;
+      // Lower multiplier = more controlled, Instagram-like
+      velocity = (-dx / dt) * 7;
 
       lastX = e.clientX;
       lastTime = now;
+      snapTarget = null;
       return;
     }
 
@@ -89,64 +147,57 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
 
     targetTranslate = percent * maxTranslate;
     velocity = 0;
+    snapTarget = null;
   });
 
-  // mobile swipe / drag with speed-sensitive momentum
-  gallery.addEventListener(
-    "touchstart",
-    (e) => {
-      touchStartX = e.touches[0].clientX;
-      touchLastX = touchStartX;
-      touchLastTime = performance.now();
-      velocity = 0;
-    },
-    { passive: true }
-  );
+  // Mobile touch
+  gallery.addEventListener("touchstart", (e) => {
+    const x = e.touches[0].clientX;
+    startX = x;
+    lastX = x;
+    lastTime = performance.now();
+    velocity = 0;
+    snapTarget = null;
+  }, { passive: true });
 
-  gallery.addEventListener(
-    "touchmove",
-    (e) => {
-      const now = performance.now();
-      const x = e.touches[0].clientX;
-      const dx = x - touchLastX;
-      const dt = Math.max(now - touchLastTime, 1);
+  gallery.addEventListener("touchmove", (e) => {
+    const now = performance.now();
+    const x = e.touches[0].clientX;
+    const dx = x - lastX;
+    const dt = Math.max(now - lastTime, 1);
 
-      targetTranslate = clamp(targetTranslate - dx, 0, maxTranslate);
+    targetTranslate = clamp(targetTranslate - dx, 0, maxTranslate);
 
-      velocity = (-dx / dt) * 14;
+    // Slightly faster on touch for phone feel
+    velocity = (-dx / dt) * 8.5;
 
-      touchLastX = x;
-      touchLastTime = now;
-    },
-    { passive: true }
-  );
+    lastX = x;
+    lastTime = now;
+  }, { passive: true });
 
-  gallery.addEventListener(
-    "touchend",
-    () => {
-      targetTranslate = clamp(targetTranslate, 0, maxTranslate);
-    },
-    { passive: true }
-  );
+  gallery.addEventListener("touchend", () => {
+    beginSnap();
+  }, { passive: true });
 
-  // desktop click-drag only
+  // Desktop click-drag only
   gallery.addEventListener("mousedown", (e) => {
     if (window.innerWidth <= 480) return;
 
-    isDown = true;
+    isPointerDown = true;
     startX = e.clientX;
     lastX = e.clientX;
     lastTime = performance.now();
     velocity = 0;
+    snapTarget = null;
     gallery.classList.add("is-dragging");
   });
 
   window.addEventListener("mouseup", () => {
-    if (!isDown) return;
+    if (!isPointerDown) return;
 
-    isDown = false;
+    isPointerDown = false;
     gallery.classList.remove("is-dragging");
-    targetTranslate = clamp(targetTranslate, 0, maxTranslate);
+    beginSnap();
   });
 
   gallery.addEventListener("dragstart", (e) => {
