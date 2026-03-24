@@ -4,86 +4,100 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
 
   if (slides.length <= 1) return;
 
-  let index = 0;
+  let isDown = false;
+  let isHovering = false;
   let startX = 0;
-  let currentX = 0;
+  let currentTranslate = 0;
+  let targetTranslate = 0;
+  let maxTranslate = 0;
 
-  function update() {
-    track.style.transform = `translateX(-${index * 100}%)`;
+  function updateBounds() {
+    maxTranslate = track.scrollWidth - gallery.offsetWidth;
+    if (maxTranslate < 0) maxTranslate = 0;
   }
 
-  function next() {
-    index = Math.min(index + 1, slides.length - 1);
-    update();
+  function animate() {
+    currentTranslate += (targetTranslate - currentTranslate) * 0.08;
+    track.style.transform = `translateX(${-currentTranslate}px)`;
+    requestAnimationFrame(animate);
   }
 
-  function prev() {
-    index = Math.max(index - 1, 0);
-    update();
-  }
+  updateBounds();
+  animate();
 
-  // mobile swipe
+  window.addEventListener("resize", updateBounds);
+
+  // desktop hover scrub
+  gallery.addEventListener("mouseenter", () => {
+    if (window.innerWidth <= 480) return;
+    isHovering = true;
+  });
+
+  gallery.addEventListener("mouseleave", () => {
+    isHovering = false;
+  });
+
+  gallery.addEventListener("mousemove", (e) => {
+    if (!isHovering || window.innerWidth <= 480) return;
+
+    const rect = gallery.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const percent = Math.max(0, Math.min(x / rect.width, 1));
+
+    targetTranslate = percent * maxTranslate;
+  });
+
+  // mobile swipe / drag
+  let touchStartX = 0;
+  let touchStartTranslate = 0;
+
   gallery.addEventListener("touchstart", (e) => {
-    startX = e.touches[0].clientX;
+    touchStartX = e.touches[0].clientX;
+    touchStartTranslate = targetTranslate;
   }, { passive: true });
 
-  gallery.addEventListener("touchend", (e) => {
-    currentX = e.changedTouches[0].clientX;
-    const diff = currentX - startX;
-
-    if (diff < -50) next();
-    if (diff > 50) prev();
-  });
-
-  // desktop scroll
-  gallery.addEventListener("wheel", (e) => {
-    e.preventDefault();
-    if (e.deltaY > 0) next();
-    else prev();
-  }, { passive: false });
+  gallery.addEventListener("touchmove", (e) => {
+    const diff = touchStartX - e.touches[0].clientX;
+    targetTranslate = Math.max(
+      0,
+      Math.min(touchStartTranslate + diff, maxTranslate)
+    );
+  }, { passive: true });
 
   // desktop drag
-  let isDown = false;
-
   gallery.addEventListener("mousedown", (e) => {
+    if (window.innerWidth <= 480) return;
     isDown = true;
     startX = e.clientX;
+    gallery.classList.add("is-dragging");
   });
 
-  window.addEventListener("mouseup", (e) => {
-    if (!isDown) return;
+  window.addEventListener("mousemove", (e) => {
+    if (!isDown || window.innerWidth <= 480) return;
+
+    const diff = startX - e.clientX;
+    startX = e.clientX;
+
+    targetTranslate = Math.max(
+      0,
+      Math.min(targetTranslate + diff, maxTranslate)
+    );
+  });
+
+  window.addEventListener("mouseup", () => {
     isDown = false;
-
-    const diff = e.clientX - startX;
-
-    if (diff < -60) next();
-    if (diff > 60) prev();
+    gallery.classList.remove("is-dragging");
   });
 
-  update();
-});
-let isHovering = false;
+  // desktop wheel
+  gallery.addEventListener("wheel", (e) => {
+    if (window.innerWidth <= 480) return;
 
-gallery.addEventListener("mouseenter", () => {
-  if (window.innerWidth <= 480) return;
-  isHovering = true;
-});
+    e.preventDefault();
 
-gallery.addEventListener("mouseleave", () => {
-  isHovering = false;
-});
-
-gallery.addEventListener("mousemove", (e) => {
-  if (!isHovering || slides.length <= 1) return;
-
-  const rect = gallery.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const percent = x / rect.width;
-
-  const newIndex = Math.floor(percent * slides.length);
-
-  if (newIndex !== index) {
-    index = Math.max(0, Math.min(newIndex, slides.length - 1));
-    update();
-  }
+    targetTranslate = Math.max(
+      0,
+      Math.min(targetTranslate + e.deltaY + e.deltaX, maxTranslate)
+    );
+  }, { passive: false });
 });
