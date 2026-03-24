@@ -194,19 +194,33 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     { passive: true }
   );
 
-  gallery.addEventListener(
-    "touchmove",
-    (e) => {
-      const x = e.touches[0].clientX;
-      const dx = x - lastX;
+gallery.addEventListener(
+  "touchmove",
+  (e) => {
+    const x = e.touches[0].clientX;
+    const dx = x - lastX;
 
-      targetTranslate = clamp(targetTranslate - dx * 2.15, 0, maxTranslate);
+    const now = performance.now();
+    const dt = now - (lastTime || now);
 
-      lastX = x;
-      snapTarget = null;
-    },
-    { passive: true }
-  );
+    // velocity (px per ms)
+    const velocity = dt > 0 ? dx / dt : 0;
+
+    // base speed + velocity boost
+    const speedMultiplier = 2.6 + Math.abs(velocity) * 6;
+
+    targetTranslate = clamp(
+      targetTranslate - dx * speedMultiplier,
+      0,
+      maxTranslate
+    );
+
+    lastX = x;
+    lastTime = now;
+    snapTarget = null;
+  },
+  { passive: true }
+);
 
   gallery.addEventListener(
     "touchend",
