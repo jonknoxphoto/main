@@ -121,31 +121,6 @@ h1.title {
 
   .gallery {
     overflow: visible;
-  }
-
-  .gallery-track {
-    display: block;
-    transform: none !important;
-  }
-
-  .archive-grid .frame,
-  .gallery .frame {
-    width: 100%;
-    display: block;
-    flex: none;
-    margin-bottom: 18px;
-  }
-
-  .gallery .frame img {
-    display: block;
-    width: 100%;
-    height: auto;
-    max-width: 100%;
-    max-height: none;
-    object-fit: contain;
-  }
-
-  .gallery {
     cursor: auto;
   }
 
@@ -153,15 +128,49 @@ h1.title {
     display: none;
   }
 
+  .gallery-track {
+    display: block !important;
+    gap: 0 !important;
+    transform: none !important;
+    will-change: auto;
+  }
+
+  .gallery-track .frame,
+  .archive-grid .frame,
+  .gallery .frame {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: none !important;
+    margin: 0 0 18px 0 !important;
+  }
+
+  .gallery-track .frame:last-child,
+  .archive-grid .frame:last-child,
+  .gallery .frame:last-child {
+    margin-bottom: 0 !important;
+  }
+
+  .gallery .frame img,
+  .gallery-track .frame img {
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    object-fit: contain;
+  }
+
   .archive-grid .frame .caption,
-  .gallery .frame .caption {
+  .gallery .frame .caption,
+  .gallery-track .frame .caption {
     position: relative !important;
     bottom: auto !important;
     left: auto !important;
     transform: none !important;
     display: flex !important;
     width: 100% !important;
-    margin-top: 8px;
+    margin-top: 8px !important;
     text-align: right;
     align-items: flex-end;
   }
