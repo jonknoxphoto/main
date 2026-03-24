@@ -156,7 +156,7 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     const dx = x - lastX;
 
     /* faster mobile swipe response */
-    targetTranslate = clamp(targetTranslate - dx * 1.65, 0, maxTranslate);
+    targetTranslate = clamp(targetTranslate - dx * 1.95, 0, maxTranslate);
 
     lastX = x;
     lastTime = performance.now();
