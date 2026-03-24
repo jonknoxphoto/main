@@ -18,13 +18,42 @@ h1.title {
   width: 100%;
   overflow: hidden;
   position: relative;
-  cursor: grab;
+  cursor: none;
   touch-action: pan-y;
   user-select: none;
 }
 
-.gallery.is-dragging {
-  cursor: grabbing;
+/* desktop-only custom cursor arrow */
+.gallery::after {
+  content: "";
+  position: absolute;
+  left: var(--cursor-x, 50%);
+  top: var(--cursor-y, 50%);
+  width: 28px;
+  height: 28px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 20;
+  opacity: 0;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+.gallery.show-cursor::after {
+  opacity: 1;
+}
+
+.gallery.cursor-left::after {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M15 5l-7 7 7 7' stroke='black' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+}
+
+.gallery.cursor-right::after {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M9 5l7 7-7 7' stroke='black' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+}
+
+.gallery.is-dragging::after {
+  opacity: 0;
 }
 
 .gallery-track {
@@ -94,6 +123,14 @@ h1.title {
   .gallery .frame {
     width: 100%;
     display: block;
+  }
+
+  .gallery {
+    cursor: auto;
+  }
+
+  .gallery::after {
+    display: none;
   }
 
   .gallery .frame img {
