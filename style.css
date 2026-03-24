@@ -8,5 +8,8 @@ h1.title {
   line-height: 0.95;
   color: #111; /* ← change from red to black */
 }
-.frame {
-  position: relative
+@media (max-width: 480px) {
+  .frame {
+    position: relative;
+  }
+}
