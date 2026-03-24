@@ -10,6 +10,7 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   let startX = 0;
   let lastX = 0;
   let lastTime = 0;
+  let touchDirection = 0;
 
   let currentTranslate = 0;
   let targetTranslate = 0;
@@ -191,53 +192,66 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     updateDesktopCursor(e);
   });
 
-// Mobile touch (controlled + accurate)
-gallery.addEventListener(
-  "touchstart",
-  (e) => {
-    const x = e.touches[0].clientX;
-    startX = x;
-    lastX = x;
-    lastTime = performance.now();
-    snapTarget = null;
-  },
-  { passive: true }
-);
+  // Mobile touch (controlled + loop on first/last)
+  gallery.addEventListener(
+    "touchstart",
+    (e) => {
+      const x = e.touches[0].clientX;
+      startX = x;
+      lastX = x;
+      lastTime = performance.now();
+      touchDirection = 0;
+      snapTarget = null;
+    },
+    { passive: true }
+  );
 
-gallery.addEventListener(
-  "touchmove",
-  (e) => {
-    const x = e.touches[0].clientX;
-    const dx = x - lastX;
+  gallery.addEventListener(
+    "touchmove",
+    (e) => {
+      const x = e.touches[0].clientX;
+      const dx = x - lastX;
 
-    const now = performance.now();
-    const dt = now - (lastTime || now);
+      const now = performance.now();
+      const dt = now - (lastTime || now);
 
-    // velocity (px/ms)
-    const velocity = dt > 0 ? dx / dt : 0;
+      const velocity = dt > 0 ? dx / dt : 0;
+      const velocityBoost = Math.min(Math.abs(velocity) * 1.2, 1.1);
+      const speedMultiplier = 1.35 + velocityBoost;
 
-    // capped velocity boost (prevents flying across all slides)
-    const velocityBoost = Math.min(Math.abs(velocity) * 1.2, 1.1);
+      targetTranslate = clamp(
+        targetTranslate - dx * speedMultiplier,
+        0,
+        maxTranslate
+      );
 
-    // balanced multiplier (precise but still responsive)
-    const speedMultiplier = 1.35 + velocityBoost;
+      if (dx !== 0) {
+        touchDirection = dx;
+      }
 
-    targetTranslate = clamp(
-      targetTranslate - dx * speedMultiplier,
-      0,
-      maxTranslate
-    );
-
-    lastX = x;
-    lastTime = now;
-    snapTarget = null;
-  },
-  { passive: true }
-);
+      lastX = x;
+      lastTime = now;
+      snapTarget = null;
+    },
+    { passive: true }
+  );
 
   gallery.addEventListener(
     "touchend",
     () => {
+      const currentIndex = getCurrentSlideIndex();
+      const lastIndex = slides.length - 1;
+
+      if (currentIndex === lastIndex && touchDirection < 0) {
+        jumpToSlide(0);
+        return;
+      }
+
+      if (currentIndex === 0 && touchDirection > 0) {
+        jumpToSlide(lastIndex);
+        return;
+      }
+
       beginSnap();
     },
     { passive: true }
