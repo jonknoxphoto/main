@@ -46,3 +46,8 @@ h1.title {
     text-align: right;  /* keeps your right-justified look */
   }
 }
+@media (max-width: 480px) {
+  .frame {
+    display: block;
+  }
+}
