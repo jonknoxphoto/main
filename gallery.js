@@ -86,8 +86,9 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   function snapToSlide(index) {
     const centers = getSlideCenters();
     const galleryCenter = getGalleryCenter();
-    const safeIndex = clamp(index, 0, slides.length - 1);
-    const translateForCenter = centers[safeIndex] - galleryCenter;
+    const totalSlides = slides.length;
+    const wrappedIndex = (index + totalSlides) % totalSlides;
+    const translateForCenter = centers[wrappedIndex] - galleryCenter;
 
     snapTarget = clamp(translateForCenter, 0, maxTranslate);
   }
@@ -155,7 +156,6 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     const x = e.touches[0].clientX;
     const dx = x - lastX;
 
-    /* faster mobile swipe response */
     targetTranslate = clamp(targetTranslate - dx * 2.15, 0, maxTranslate);
 
     lastX = x;
@@ -163,7 +163,6 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     snapTarget = null;
   }, { passive: true });
 
-  // mobile release snaps nearest photo center
   gallery.addEventListener("touchend", () => {
     beginSnap();
   }, { passive: true });
@@ -192,11 +191,12 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
       const x = e.clientX - rect.left;
       const centerX = rect.width / 2;
       const currentIndex = getCurrentSlideIndex();
+      const totalSlides = slides.length;
 
       if (x > centerX) {
-        snapToSlide(currentIndex + 1);
+        snapToSlide((currentIndex + 1) % totalSlides);
       } else {
-        snapToSlide(currentIndex - 1);
+        snapToSlide((currentIndex - 1 + totalSlides) % totalSlides);
       }
     } else {
       beginSnap();
