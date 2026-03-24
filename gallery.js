@@ -9,7 +9,6 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
 
   let startX = 0;
   let lastX = 0;
-  let lastTime = 0;
 
   let currentTranslate = 0;
   let targetTranslate = 0;
@@ -18,6 +17,10 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
 
   function clamp(value, min, max) {
     return Math.max(min, Math.min(value, max));
+  }
+
+  function isDesktop() {
+    return window.innerWidth > 480;
   }
 
   function getGalleryCenter() {
@@ -97,6 +100,25 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     snapTarget = getNearestCenterSnap(targetTranslate);
   }
 
+  function updateDesktopCursor(e) {
+    if (!isDesktop() || isPointerDown) return;
+
+    const rect = gallery.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+
+    gallery.style.setProperty("--cursor-x", `${x}px`);
+    gallery.style.setProperty("--cursor-y", `${y}px`);
+    gallery.classList.add("show-cursor");
+    gallery.classList.toggle("cursor-left", x < centerX);
+    gallery.classList.toggle("cursor-right", x >= centerX);
+  }
+
+  function clearDesktopCursor() {
+    gallery.classList.remove("show-cursor", "cursor-left", "cursor-right");
+  }
+
   function animate() {
     if (snapTarget !== null && !isPointerDown) {
       targetTranslate += (snapTarget - targetTranslate) * 0.18;
@@ -125,95 +147,125 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   window.addEventListener("resize", () => {
     updateBounds();
     beginSnap();
+
+    if (!isDesktop()) {
+      clearDesktopCursor();
+    }
   });
 
-  // Desktop drag
-  gallery.addEventListener("mousemove", (e) => {
-    if (window.innerWidth <= 480) return;
-    if (!isPointerDown) return;
+  gallery.addEventListener("mouseenter", (e) => {
+    if (!isDesktop()) return;
+    updateDesktopCursor(e);
+  });
 
-    if (Math.abs(e.clientX - startX) > 4) {
-      hasDragged = true;
+  gallery.addEventListener("mouseleave", () => {
+    clearDesktopCursor();
+  });
+
+  // Desktop drag + cursor follow
+  gallery.addEventListener("mousemove", (e) => {
+    if (!isDesktop()) return;
+
+    if (isPointerDown) {
+      if (Math.abs(e.clientX - startX) > 4) {
+        hasDragged = true;
+      }
+
+      const dx = e.clientX - lastX;
+      targetTranslate = clamp(targetTranslate - dx, 0, maxTranslate);
+
+      lastX = e.clientX;
+      snapTarget = null;
+      return;
     }
 
-    const dx = e.clientX - lastX;
-    targetTranslate = clamp(targetTranslate - dx, 0, maxTranslate);
-
-    lastX = e.clientX;
-    snapTarget = null;
+    updateDesktopCursor(e);
   });
 
   // Mobile touch
-  gallery.addEventListener("touchstart", (e) => {
-    const x = e.touches[0].clientX;
-    startX = x;
-    lastX = x;
-    lastTime = performance.now();
-    snapTarget = null;
-  }, { passive: true });
+  gallery.addEventListener(
+    "touchstart",
+    (e) => {
+      const x = e.touches[0].clientX;
+      startX = x;
+      lastX = x;
+      snapTarget = null;
+    },
+    { passive: true }
+  );
 
-  gallery.addEventListener("touchmove", (e) => {
-    const x = e.touches[0].clientX;
-    const dx = x - lastX;
+  gallery.addEventListener(
+    "touchmove",
+    (e) => {
+      const x = e.touches[0].clientX;
+      const dx = x - lastX;
 
-    targetTranslate = clamp(targetTranslate - dx * 2.15, 0, maxTranslate);
+      targetTranslate = clamp(targetTranslate - dx * 2.15, 0, maxTranslate);
 
-    lastX = x;
-    lastTime = performance.now();
-    snapTarget = null;
-  }, { passive: true });
+      lastX = x;
+      snapTarget = null;
+    },
+    { passive: true }
+  );
 
-  gallery.addEventListener("touchend", () => {
-    beginSnap();
-  }, { passive: true });
+  gallery.addEventListener(
+    "touchend",
+    () => {
+      beginSnap();
+    },
+    { passive: true }
+  );
 
   // Desktop drag / click
   gallery.addEventListener("mousedown", (e) => {
-    if (window.innerWidth <= 480) return;
+    if (!isDesktop()) return;
 
     isPointerDown = true;
     hasDragged = false;
     startX = e.clientX;
     lastX = e.clientX;
-    lastTime = performance.now();
     snapTarget = null;
     gallery.classList.add("is-dragging");
+    clearDesktopCursor();
   });
 
-window.addEventListener("mouseup", (e) => {
-  if (!isPointerDown) return;
+  window.addEventListener("mouseup", (e) => {
+    if (!isPointerDown) return;
 
-  isPointerDown = false;
-  gallery.classList.remove("is-dragging");
+    isPointerDown = false;
+    gallery.classList.remove("is-dragging");
 
-  if (!hasDragged && window.innerWidth > 480) {
-    const rect = gallery.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const centerX = rect.width / 2;
-    const currentIndex = getCurrentSlideIndex();
-    const totalSlides = slides.length;
+    if (!hasDragged && isDesktop()) {
+      const rect = gallery.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const centerX = rect.width / 2;
+      const currentIndex = getCurrentSlideIndex();
+      const totalSlides = slides.length;
 
-    let nextIndex;
+      let nextIndex;
 
-    if (x > centerX) {
-      nextIndex = (currentIndex + 1) % totalSlides;
+      if (x > centerX) {
+        nextIndex = (currentIndex + 1) % totalSlides;
+      } else {
+        nextIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+      }
+
+      const centers = getSlideCenters();
+      const galleryCenter = getGalleryCenter();
+      const translateForCenter = centers[nextIndex] - galleryCenter;
+      const finalTranslate = clamp(translateForCenter, 0, maxTranslate);
+
+      targetTranslate = finalTranslate;
+      currentTranslate = finalTranslate;
+      snapTarget = null;
     } else {
-      nextIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+      beginSnap();
     }
 
-    // 👇 instant jump (no easing)
-    const centers = getSlideCenters();
-    const galleryCenter = getGalleryCenter();
-    const translateForCenter = centers[nextIndex] - galleryCenter;
-    const finalTranslate = clamp(translateForCenter, 0, maxTranslate);
-
-    targetTranslate = finalTranslate;
-    currentTranslate = finalTranslate;
-    snapTarget = null;
-  } else {
-    beginSnap();
-  }
-});
+    if (isDesktop()) {
+      updateDesktopCursor(e);
+    }
+  });
 
   gallery.addEventListener("dragstart", (e) => {
     e.preventDefault();
