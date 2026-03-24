@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Jon Knox — Photographs</title>
 
-  <!-- LINK YOUR CSS FILE -->
   <link rel="stylesheet" href="style.css" />
 
   <style>
@@ -117,7 +116,6 @@
       margin-top: 20px;
     }
 
-    /* 🔑 IMPORTANT FIX — don't override your external CSS */
     h1:not(.title) {
       margin: 0 0 18px;
       font-size: clamp(34px, 5vw, 68px);
@@ -135,7 +133,94 @@
       text-align: left;
     }
 
-    /* rest unchanged... */
+    .archive-grid {
+      display: grid;
+      gap: 26px;
+    }
+
+    .item {
+      position: relative;
+    }
+
+    .frame {
+      position: relative;
+      width: fit-content;
+      margin: 0 auto;
+    }
+
+    .caption {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      transform: translate(10px, -8px);
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      color: #111;
+      text-shadow: none;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .caption .cap-title {
+      font-weight: 600;
+    }
+
+    .caption .cap-meta {
+      font-weight: 400;
+      opacity: 0.7;
+    }
+
+    .info {
+      margin-top: 28px;
+      text-align: left;
+    }
+
+    .info p {
+      margin: 8px 0 18px;
+      max-width: 720px;
+      text-transform: none;
+      letter-spacing: normal;
+      font-size: 14px;
+      line-height: 1.5;
+      color: #111;
+    }
+
+    .contact-link {
+      display: inline-block;
+      margin-top: 4px;
+    }
+
+    .footer {
+      margin-top: 20px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 480px) {
+      .page {
+        padding-left: 20px;
+        padding-right: 20px;
+      }
+
+      img {
+        width: 100%;
+      }
+
+      .frame {
+        width: 100%;
+      }
+
+      .caption {
+        transform: translate(12px, -10px);
+        font-size: 9px;
+      }
+
+      .archive-grid .item:last-child img {
+        margin-bottom: 20px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -150,15 +235,15 @@
         <a href="#contact">Contact</a>
       </nav>
     </header>
-    
-<section class="hero">
-  <div class="hero-copy">
-    <div class="header-line">
-      <h1 class="title">Jon Knox</h1>
-    </div>
-    <div class="meta">Paris / New York / California</div>
-  </div>
-</section>
+
+    <section class="hero">
+      <div class="hero-copy">
+        <div class="header-line">
+          <h1 class="title">Jon Knox</h1>
+        </div>
+        <div class="meta">Paris / New York / California</div>
+      </div>
+    </section>
 
     <section id="archive">
       <div class="archive-head">
@@ -169,123 +254,125 @@
 
         <article class="item">
           <div class="frame">
-       <img
-  src="images/mom2.jpg"
-  alt="California"
-  loading="lazy"
-  decoding="async"
-/>
-          </div>
-          <div class="caption">
-            <span>California</span>
-            <span>Document</span>
-          </div>
-        </article>
-
-        <article class="item">
-          <div class="frame">
-                 <img
-  src="images/divecanal2.jpg"
-  alt="Dive"
-  loading="lazy"
-  decoding="async"
-/>
-          </div>
-          <div class="caption">
-            <span>Paris</span>
-            <span>2025</span>
-          </div>
-        </article>
-
-        <article class="item">
-          <div class="frame">
-               <img
-  src="images/bikekid2.jpg"
-  alt="Dimessq"
-  loading="lazy"
-  decoding="async"
-/>
-          </div>
-          <div class="caption">
-            <span>Nike x Bike Life</span>
-            <span>2023</span>
-          </div>
-        </article>
-
-        <article class="item">
-          <div class="frame">
-             <img
-  src="images/chio2.jpg"
-  alt="Chiomato"
-  loading="lazy"
-  decoding="async"
-/>
-          </div>
-          <div class="caption">
-            <span>Chiomato x Cafe Forgot</span>
+            <img
+              src="images/mom2.jpg"
+              alt="California"
+              loading="lazy"
+              decoding="async"
+            />
+            <div class="caption">
+              <span class="cap-title">California</span>
+              <span class="cap-meta">Document</span>
+            </div>
           </div>
         </article>
 
         <article class="item">
           <div class="frame">
             <img
-  src="images/brothers2.jpg"
-  alt="Brothers"
-  loading="lazy"
-  decoding="async"
-/>
-          </div>
-          <div class="caption">
-            <span>Brothers</span>
-            <span>Heritage</span>
+              src="images/divecanal2.jpg"
+              alt="Dive"
+              loading="lazy"
+              decoding="async"
+            />
+            <div class="caption">
+              <span class="cap-title">Paris</span>
+              <span class="cap-meta">2025</span>
+            </div>
           </div>
         </article>
-           <article class="item">
+
+        <article class="item">
           <div class="frame">
             <img
-  src="images/brendan2.jpg"
-  alt="Brendan"
-  loading="lazy"
-  decoding="async"
-/>
-          </div>
-          <div class="caption">
-            <span>Brendan</span>
-            <span>2006</span>
+              src="images/bikekid2.jpg"
+              alt="Dimessq"
+              loading="lazy"
+              decoding="async"
+            />
+            <div class="caption">
+              <span class="cap-title">Nike x Bike Life</span>
+              <span class="cap-meta">2023</span>
+            </div>
           </div>
         </article>
-        
-          <article class="item">
+
+        <article class="item">
           <div class="frame">
-          <img
-  src="images/ella2.jpg"
-  alt="Greece"
-  loading="lazy"
-  decoding="async"
-/>
-          </div>
-          <div class="caption">
-            <span>Greece</span>
-            <span>2022</span>
+            <img
+              src="images/chio2.jpg"
+              alt="Chiomato"
+              loading="lazy"
+              decoding="async"
+            />
+            <div class="caption">
+              <span class="cap-title">Chiomato x Cafe Forgot</span>
+            </div>
           </div>
         </article>
-                  <article class="item">
+
+        <article class="item">
           <div class="frame">
-          <img
-  src="images/sunflower.jpg"
-  alt="Sunflower"
-  loading="lazy"
-  decoding="async"
-/>
-          </div>
-          <div class="caption">
-            <span>Église</span>
-            <span>2022</span>
+            <img
+              src="images/brothers2.jpg"
+              alt="Brothers"
+              loading="lazy"
+              decoding="async"
+            />
+            <div class="caption">
+              <span class="cap-title">Brothers</span>
+              <span class="cap-meta">Heritage</span>
+            </div>
           </div>
         </article>
-        
+
+        <article class="item">
+          <div class="frame">
+            <img
+              src="images/brendan2.jpg"
+              alt="Brendan"
+              loading="lazy"
+              decoding="async"
+            />
+            <div class="caption">
+              <span class="cap-title">Brendan</span>
+              <span class="cap-meta">2006</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="item">
+          <div class="frame">
+            <img
+              src="images/ella2.jpg"
+              alt="Greece"
+              loading="lazy"
+              decoding="async"
+            />
+            <div class="caption">
+              <span class="cap-title">Greece</span>
+              <span class="cap-meta">2022</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="item">
+          <div class="frame">
+            <img
+              src="images/sunflower.jpg"
+              alt="Sunflower"
+              loading="lazy"
+              decoding="async"
+            />
+            <div class="caption">
+              <span class="cap-title">Église</span>
+              <span class="cap-meta">2022</span>
+            </div>
+          </div>
+        </article>
+
       </div>
-    </section> 
+    </section>
 
     <section id="info" class="info">
       <div>
@@ -305,5 +392,3 @@
   </div>
 </body>
 </html>
-
-
