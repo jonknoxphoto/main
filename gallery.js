@@ -5,7 +5,6 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   if (slides.length <= 1) return;
 
   let isPointerDown = false;
-  let isHovering = false;
   let hasDragged = false;
 
   let startX = 0;
@@ -93,9 +92,13 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     snapTarget = clamp(translateForCenter, 0, maxTranslate);
   }
 
+  function beginSnap() {
+    snapTarget = getNearestCenterSnap(targetTranslate);
+  }
+
   function animate() {
-    if (snapTarget !== null && !isPointerDown && !isHovering) {
-      targetTranslate += (snapTarget - targetTranslate) * 0.12;
+    if (snapTarget !== null && !isPointerDown) {
+      targetTranslate += (snapTarget - targetTranslate) * 0.14;
 
       if (Math.abs(snapTarget - targetTranslate) < 0.5) {
         targetTranslate = snapTarget;
@@ -115,10 +118,6 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     requestAnimationFrame(animate);
   }
 
-  function beginSnap() {
-    snapTarget = getNearestCenterSnap(targetTranslate);
-  }
-
   updateBounds();
   animate();
 
@@ -127,46 +126,22 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     beginSnap();
   });
 
-  // Desktop hover scrub
-  gallery.addEventListener("mouseenter", () => {
-    if (window.innerWidth <= 480) return;
-    isHovering = true;
-    snapTarget = null;
-  });
-
-  gallery.addEventListener("mouseleave", () => {
-    if (window.innerWidth <= 480) return;
-    isHovering = false;
-    beginSnap();
-  });
-
+  // Desktop drag
   gallery.addEventListener("mousemove", (e) => {
     if (window.innerWidth <= 480) return;
+    if (!isPointerDown) return;
 
-    if (isPointerDown) {
-      const now = performance.now();
-      const dx = e.clientX - lastX;
-      const dt = Math.max(now - lastTime, 1);
+    const now = performance.now();
+    const dx = e.clientX - lastX;
+    lastTime = Math.max(now - lastTime, 1);
 
-      if (Math.abs(e.clientX - startX) > 4) {
-        hasDragged = true;
-      }
-
-      targetTranslate = clamp(targetTranslate - dx, 0, maxTranslate);
-
-      lastX = e.clientX;
-      lastTime = now;
-      snapTarget = null;
-      return;
+    if (Math.abs(e.clientX - startX) > 4) {
+      hasDragged = true;
     }
 
-    if (!isHovering) return;
+    targetTranslate = clamp(targetTranslate - dx, 0, maxTranslate);
 
-    const rect = gallery.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const percent = clamp(x / rect.width, 0, 1);
-
-    targetTranslate = percent * maxTranslate;
+    lastX = e.clientX;
     snapTarget = null;
   });
 
@@ -180,19 +155,17 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   }, { passive: true });
 
   gallery.addEventListener("touchmove", (e) => {
-    const now = performance.now();
     const x = e.touches[0].clientX;
     const dx = x - lastX;
-    const dt = Math.max(now - lastTime, 1);
 
-    // Faster mobile swipe response
     targetTranslate = clamp(targetTranslate - dx * 1.35, 0, maxTranslate);
 
     lastX = x;
-    lastTime = now;
+    lastTime = performance.now();
     snapTarget = null;
   }, { passive: true });
 
+  // ✅ Mobile release snaps nearest image center
   gallery.addEventListener("touchend", () => {
     beginSnap();
   }, { passive: true });
