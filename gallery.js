@@ -16,6 +16,7 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   let targetTranslate = 0;
   let maxTranslate = 0;
   let snapTarget = null;
+  let skipLerpFrame = false;
 
   function clamp(value, min, max) {
     return Math.max(min, Math.min(value, max));
@@ -101,9 +102,12 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
 
   function jumpToSlide(index) {
     const finalTranslate = getSlideTranslate(index);
+
     currentTranslate = finalTranslate;
     targetTranslate = finalTranslate;
     snapTarget = null;
+    skipLerpFrame = true;
+
     track.style.transform = `translateX(${-finalTranslate}px)`;
   }
 
@@ -131,6 +135,13 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   }
 
   function animate() {
+    if (skipLerpFrame) {
+      track.style.transform = `translateX(${-currentTranslate}px)`;
+      skipLerpFrame = false;
+      requestAnimationFrame(animate);
+      return;
+    }
+
     if (snapTarget !== null && !isPointerDown) {
       targetTranslate += (snapTarget - targetTranslate) * 0.18;
 
@@ -192,7 +203,6 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     updateDesktopCursor(e);
   });
 
-  // Mobile touch (controlled + loop on first/last)
   gallery.addEventListener(
     "touchstart",
     (e) => {
