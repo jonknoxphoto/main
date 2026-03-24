@@ -6,5 +6,5 @@ h1.title {
   letter-spacing: 0.16em;
   text-transform: uppercase;
   line-height: 0.95;
-  color: #111;
+  color: #111; /* ← change from red to black */
 }
