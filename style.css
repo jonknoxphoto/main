@@ -8,15 +8,5 @@ h1.title {
   line-height: 0.95;
   color: #111; /* ← change from red to black */
 }
-.caption {
-  position: absolute;
-  bottom: 6px;
-  left: 8px;
-
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-
-  color: #fff;
-  text-shadow: 0 0 6px rgba(0,0,0,0.6);
-}
+.frame {
+  position: relative
