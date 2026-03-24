@@ -6,6 +6,7 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
 
   let isPointerDown = false;
   let isHovering = false;
+  let hasDragged = false;
 
   let startX = 0;
   let lastX = 0;
@@ -60,6 +61,36 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     });
 
     return best;
+  }
+
+  function getCurrentSlideIndex() {
+    const snapped = getNearestCenterSnap(targetTranslate);
+    const galleryCenter = getGalleryCenter();
+    const centers = getSlideCenters();
+
+    let bestIndex = 0;
+    let smallestDistance = Infinity;
+
+    centers.forEach((center, index) => {
+      const translateForCenter = clamp(center - galleryCenter, 0, maxTranslate);
+      const distance = Math.abs(translateForCenter - snapped);
+
+      if (distance < smallestDistance) {
+        smallestDistance = distance;
+        bestIndex = index;
+      }
+    });
+
+    return bestIndex;
+  }
+
+  function snapToSlide(index) {
+    const centers = getSlideCenters();
+    const galleryCenter = getGalleryCenter();
+    const safeIndex = clamp(index, 0, slides.length - 1);
+    const translateForCenter = centers[safeIndex] - galleryCenter;
+
+    snapTarget = clamp(translateForCenter, 0, maxTranslate);
   }
 
   function animate() {
@@ -117,6 +148,10 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
       const dx = e.clientX - lastX;
       const dt = Math.max(now - lastTime, 1);
 
+      if (Math.abs(e.clientX - startX) > 4) {
+        hasDragged = true;
+      }
+
       targetTranslate = clamp(targetTranslate - dx, 0, maxTranslate);
 
       lastX = e.clientX;
@@ -150,7 +185,8 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     const dx = x - lastX;
     const dt = Math.max(now - lastTime, 1);
 
-    targetTranslate = clamp(targetTranslate - dx, 0, maxTranslate);
+    // Faster mobile swipe response
+    targetTranslate = clamp(targetTranslate - dx * 1.35, 0, maxTranslate);
 
     lastX = x;
     lastTime = now;
@@ -161,11 +197,12 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     beginSnap();
   }, { passive: true });
 
-  // Desktop click-drag only
+  // Desktop drag / click
   gallery.addEventListener("mousedown", (e) => {
     if (window.innerWidth <= 480) return;
 
     isPointerDown = true;
+    hasDragged = false;
     startX = e.clientX;
     lastX = e.clientX;
     lastTime = performance.now();
@@ -173,12 +210,26 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     gallery.classList.add("is-dragging");
   });
 
-  window.addEventListener("mouseup", () => {
+  window.addEventListener("mouseup", (e) => {
     if (!isPointerDown) return;
 
     isPointerDown = false;
     gallery.classList.remove("is-dragging");
-    beginSnap();
+
+    if (!hasDragged && window.innerWidth > 480) {
+      const rect = gallery.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const centerX = rect.width / 2;
+      const currentIndex = getCurrentSlideIndex();
+
+      if (x > centerX) {
+        snapToSlide(currentIndex + 1);
+      } else {
+        snapToSlide(currentIndex - 1);
+      }
+    } else {
+      beginSnap();
+    }
   });
 
   gallery.addEventListener("dragstart", (e) => {
