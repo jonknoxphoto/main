@@ -55,3 +55,78 @@ h1.title {
     align-items: flex-end;
   }
 }
+.gallery {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  cursor: grab;
+  touch-action: pan-y;
+}
+
+.gallery.is-dragging {
+  cursor: grabbing;
+}
+
+.gallery-track {
+  display: flex;
+  will-change: transform;
+  transition: transform 0.35s ease;
+}
+
+.gallery .item {
+  flex: 0 0 100%;
+  width: 100%;
+}
+
+.gallery .frame {
+  position: relative;
+  width: fit-content;
+  margin: 0 auto;
+}
+
+.gallery .frame img {
+  display: block;
+  width: 80%;
+  max-width: 860px;
+  height: auto;
+  margin: 0 auto;
+}
+
+.gallery .caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  transform: translate(10px, -8px);
+  display: inline-flex;
+  flex-direction: column;
+  gap: 1px;
+  width: max-content;
+  text-align: right;
+  align-items: flex-start;
+  color: #111;
+  text-shadow: none;
+  z-index: 2;
+  pointer-events: none;
+}
+
+@media (max-width: 480px) {
+  .gallery .frame {
+    width: 100%;
+  }
+
+  .gallery .frame img {
+    width: 100%;
+    max-width: none;
+  }
+
+  .gallery .frame .caption {
+    position: relative !important;
+    bottom: auto !important;
+    left: auto !important;
+    transform: none !important;
+    display: block !important;
+    width: 100% !important;
+    margin-top: 8px;
+    text-align: right;
+  }
+}
