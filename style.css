@@ -37,6 +37,7 @@ h1.title {
   position: relative;
   cursor: grab;
   touch-action: pan-y;
+  user-select: none;
 }
 
 .gallery.is-dragging {
@@ -48,7 +49,6 @@ h1.title {
   align-items: center;
   gap: 20px;
   will-change: transform;
-  transition: transform 0.35s ease;
 }
 
 .gallery-track .frame {
@@ -78,8 +78,8 @@ h1.title {
 .gallery .caption {
   position: absolute;
   bottom: 0;
-  left: 50%;
-  transform: translate(calc(-40% + 10px), -8px);
+  left: 0;
+  transform: translate(10px, -8px);
   display: inline-flex;
   flex-direction: column;
   gap: 1px;
