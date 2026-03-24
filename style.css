@@ -119,10 +119,30 @@ h1.title {
     width: 100%;
   }
 
+  .gallery {
+    overflow: visible;
+  }
+
+  .gallery-track {
+    display: block;
+    transform: none !important;
+  }
+
   .archive-grid .frame,
   .gallery .frame {
     width: 100%;
     display: block;
+    flex: none;
+    margin-bottom: 18px;
+  }
+
+  .gallery .frame img {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+    max-height: none;
+    object-fit: contain;
   }
 
   .gallery {
@@ -131,13 +151,6 @@ h1.title {
 
   .gallery::after {
     display: none;
-  }
-
-  .gallery .frame img {
-    width: 100%;
-    height: auto;
-    max-width: none;
-    max-height: none;
   }
 
   .archive-grid .frame .caption,
