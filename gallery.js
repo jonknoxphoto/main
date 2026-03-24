@@ -62,3 +62,28 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
 
   update();
 });
+let isHovering = false;
+
+gallery.addEventListener("mouseenter", () => {
+  if (window.innerWidth <= 480) return;
+  isHovering = true;
+});
+
+gallery.addEventListener("mouseleave", () => {
+  isHovering = false;
+});
+
+gallery.addEventListener("mousemove", (e) => {
+  if (!isHovering || slides.length <= 1) return;
+
+  const rect = gallery.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const percent = x / rect.width;
+
+  const newIndex = Math.floor(percent * slides.length);
+
+  if (newIndex !== index) {
+    index = Math.max(0, Math.min(newIndex, slides.length - 1));
+    update();
+  }
+});
