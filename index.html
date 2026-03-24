@@ -148,18 +148,47 @@
       width: 100%;
       overflow: hidden;
       position: relative;
-      cursor: grab;
+      cursor: none;
       touch-action: pan-y;
+      user-select: none;
     }
 
-    .gallery.is-dragging {
-      cursor: grabbing;
+    .gallery::after {
+      content: "";
+      position: absolute;
+      left: var(--cursor-x, 50%);
+      top: var(--cursor-y, 50%);
+      width: 28px;
+      height: 28px;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      z-index: 20;
+      opacity: 0;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: contain;
+    }
+
+    .gallery.show-cursor::after {
+      opacity: 1;
+    }
+
+    .gallery.cursor-left::after {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M15 5l-7 7 7 7' stroke='black' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+    }
+
+    .gallery.cursor-right::after {
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M9 5l7 7-7 7' stroke='black' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+    }
+
+    .gallery.is-dragging::after {
+      opacity: 0;
     }
 
     .gallery-track {
       display: flex;
+      align-items: center;
       will-change: transform;
-      transition: transform 0.35s ease;
     }
 
     .gallery-track .frame {
@@ -167,14 +196,19 @@
       width: 100%;
       position: relative;
       margin: 0 auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
     .gallery-track .frame img {
       display: block;
-      width: 80%;
-      max-width: 860px;
-      height: auto;
+      width: auto;
+      height: 70vh;
+      max-width: 100%;
+      max-height: 70vh;
       margin: 0 auto;
+      object-fit: contain;
     }
 
     .caption {
@@ -240,13 +274,23 @@
         width: 100%;
       }
 
+      .gallery {
+        cursor: auto;
+      }
+
+      .gallery::after {
+        display: none;
+      }
+
       .gallery-track .frame {
         width: 100%;
       }
 
       .gallery-track .frame img {
         width: 100%;
+        height: auto;
         max-width: none;
+        max-height: none;
       }
 
       .gallery-track .frame .caption {
@@ -294,65 +338,58 @@
         <div class="section-label">Archive</div>
       </div>
 
-     <div class="archive-grid">
-  <article class="item">
-    <div class="gallery">
-      <div class="gallery-track">
-
-        <div class="frame">
-          <img src="images/mom2.jpg" alt="California" loading="lazy" decoding="async" />
-          <div class="caption">
-            <span class="cap-title">California</span>
-            <span class="cap-meta">Document</span>
-          </div>
-        </div>
-
-        <div class="frame">
-          <img src="images/hillsmorgan.jpg" alt="California hills" loading="lazy" decoding="async" />
-          <div class="caption">
-            <span class="cap-title">California</span>
-            <span class="cap-meta">Document</span>
-          </div>
-        </div>
-
-        <div class="frame">
-          <img src="images/momcandle.jpg" alt="California hills" loading="lazy" decoding="async" />
-          <div class="caption">
-            <span class="cap-title">California</span>
-            <span class="cap-meta">Document</span>
-          </div>
-        </div>
-
-        <div class="frame">
-          <img src="images/madrone.jpg" alt="California hills" loading="lazy" decoding="async" />
-          <div class="caption">
-            <span class="cap-title">California</span>
-            <span class="cap-meta">Document</span>
-          </div>
-        </div>
-
-        <div class="frame">
-          <img src="images/trailer.jpg" alt="California hills" loading="lazy" decoding="async" />
-          <div class="caption">
-            <span class="cap-title">California</span>
-            <span class="cap-meta">Document</span>
-          </div>
-        </div>
-
-      </div>
-    </div>
-  </article>
-</div>
+      <div class="archive-grid">
         <article class="item">
           <div class="gallery">
             <div class="gallery-track">
               <div class="frame">
-                <img
-                  src="images/bikekid2.jpg"
-                  alt="Dimessq"
-                  loading="lazy"
-                  decoding="async"
-                />
+                <img src="images/mom2.jpg" alt="California" loading="lazy" decoding="async" />
+                <div class="caption">
+                  <span class="cap-title">California</span>
+                  <span class="cap-meta">Document</span>
+                </div>
+              </div>
+
+              <div class="frame">
+                <img src="images/hillsmorgan.jpg" alt="California hills" loading="lazy" decoding="async" />
+                <div class="caption">
+                  <span class="cap-title">California</span>
+                  <span class="cap-meta">Document</span>
+                </div>
+              </div>
+
+              <div class="frame">
+                <img src="images/momcandle.jpg" alt="California hills" loading="lazy" decoding="async" />
+                <div class="caption">
+                  <span class="cap-title">California</span>
+                  <span class="cap-meta">Document</span>
+                </div>
+              </div>
+
+              <div class="frame">
+                <img src="images/madrone.jpg" alt="California hills" loading="lazy" decoding="async" />
+                <div class="caption">
+                  <span class="cap-title">California</span>
+                  <span class="cap-meta">Document</span>
+                </div>
+              </div>
+
+              <div class="frame">
+                <img src="images/trailer.jpg" alt="California hills" loading="lazy" decoding="async" />
+                <div class="caption">
+                  <span class="cap-title">California</span>
+                  <span class="cap-meta">Document</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="item">
+          <div class="gallery">
+            <div class="gallery-track">
+              <div class="frame">
+                <img src="images/bikekid2.jpg" alt="Dimessq" loading="lazy" decoding="async" />
                 <div class="caption">
                   <span class="cap-title">New York</span>
                   <span class="cap-meta">2023</span>
@@ -366,12 +403,7 @@
           <div class="gallery">
             <div class="gallery-track">
               <div class="frame">
-                <img
-                  src="images/chio2.jpg"
-                  alt="Chiomato"
-                  loading="lazy"
-                  decoding="async"
-                />
+                <img src="images/chio2.jpg" alt="Chiomato" loading="lazy" decoding="async" />
                 <div class="caption">
                   <span class="cap-title">Chiomato</span>
                 </div>
@@ -384,12 +416,7 @@
           <div class="gallery">
             <div class="gallery-track">
               <div class="frame">
-                <img
-                  src="images/brothers2.jpg"
-                  alt="Brothers"
-                  loading="lazy"
-                  decoding="async"
-                />
+                <img src="images/brothers2.jpg" alt="Brothers" loading="lazy" decoding="async" />
                 <div class="caption">
                   <span class="cap-title">Brothers</span>
                   <span class="cap-meta">Heritage</span>
@@ -403,12 +430,7 @@
           <div class="gallery">
             <div class="gallery-track">
               <div class="frame">
-                <img
-                  src="images/brendan2.jpg"
-                  alt="Brendan"
-                  loading="lazy"
-                  decoding="async"
-                />
+                <img src="images/brendan2.jpg" alt="Brendan" loading="lazy" decoding="async" />
                 <div class="caption">
                   <span class="cap-title">Brendan</span>
                   <span class="cap-meta">2006</span>
@@ -422,12 +444,7 @@
           <div class="gallery">
             <div class="gallery-track">
               <div class="frame">
-                <img
-                  src="images/ella2.jpg"
-                  alt="Greece"
-                  loading="lazy"
-                  decoding="async"
-                />
+                <img src="images/ella2.jpg" alt="Greece" loading="lazy" decoding="async" />
                 <div class="caption">
                   <span class="cap-title">Greece</span>
                   <span class="cap-meta">2022</span>
@@ -441,12 +458,7 @@
           <div class="gallery">
             <div class="gallery-track">
               <div class="frame">
-                <img
-                  src="images/sunflower.jpg"
-                  alt="Sunflower"
-                  loading="lazy"
-                  decoding="async"
-                />
+                <img src="images/sunflower.jpg" alt="Sunflower" loading="lazy" decoding="async" />
                 <div class="caption">
                   <span class="cap-title">Église</span>
                   <span class="cap-meta">2022</span>
@@ -455,7 +467,6 @@
             </div>
           </div>
         </article>
-
       </div>
     </section>
 
@@ -481,94 +492,257 @@
       const track = gallery.querySelector(".gallery-track");
       const slides = Array.from(track.querySelectorAll(".frame"));
 
-      if (slides.length <= 1) return;
+      if (!track || slides.length <= 1) return;
 
-      let index = 0;
-      let startX = 0;
-      let currentX = 0;
       let isPointerDown = false;
+      let hasDragged = false;
 
-      function clampIndex(i) {
-        return Math.max(0, Math.min(i, slides.length - 1));
+      let startX = 0;
+      let lastX = 0;
+      let touchDirection = 0;
+
+      let currentIndex = 0;
+      let currentTranslate = 0;
+      let targetTranslate = 0;
+
+      function isDesktop() {
+        return window.innerWidth > 480;
       }
 
-      function updateGallery(animated = true) {
-        track.style.transition = animated ? "transform 0.35s ease" : "none";
-        track.style.transform = `translateX(-${index * 100}%)`;
+      function clamp(value, min, max) {
+        return Math.max(min, Math.min(value, max));
       }
 
-      function goToSlide(i) {
-        index = clampIndex(i);
-        updateGallery(true);
+      function getGalleryCenter() {
+        return gallery.clientWidth / 2;
       }
 
-      function nextSlide() {
-        goToSlide(index + 1);
+      function getMaxTranslate() {
+        return Math.max(0, track.scrollWidth - gallery.clientWidth);
       }
 
-      function prevSlide() {
-        goToSlide(index - 1);
+      function getSlideCenters() {
+        const gap = parseFloat(getComputedStyle(track).gap || "0");
+        let offset = 0;
+
+        return slides.map((slide) => {
+          const center = offset + slide.offsetWidth / 2;
+          offset += slide.offsetWidth + gap;
+          return center;
+        });
       }
 
-      function isMobile() {
-        return window.matchMedia("(max-width: 480px)").matches;
+      function getSlideTranslate(index) {
+        const centers = getSlideCenters();
+        const galleryCenter = getGalleryCenter();
+        const safeIndex = clamp(index, 0, slides.length - 1);
+        const rawTranslate = centers[safeIndex] - galleryCenter;
+        return clamp(rawTranslate, 0, getMaxTranslate());
       }
 
-      gallery.addEventListener("touchstart", (e) => {
-        startX = e.touches[0].clientX;
-        currentX = startX;
-      }, { passive: true });
+      function applyTransform() {
+        track.style.transform = `translateX(${-currentTranslate}px)`;
+      }
 
-      gallery.addEventListener("touchmove", (e) => {
-        currentX = e.touches[0].clientX;
-      }, { passive: true });
+      function jumpToSlide(index) {
+        currentIndex = clamp(index, 0, slides.length - 1);
+        const translate = getSlideTranslate(currentIndex);
+        currentTranslate = translate;
+        targetTranslate = translate;
+        applyTransform();
+      }
 
-      gallery.addEventListener("touchend", () => {
-        const diff = currentX - startX;
-        if (diff < -50) nextSlide();
-        if (diff > 50) prevSlide();
+      function animateToSlide(index) {
+        currentIndex = clamp(index, 0, slides.length - 1);
+        targetTranslate = getSlideTranslate(currentIndex);
+      }
+
+      function goNextInstant() {
+        if (currentIndex === slides.length - 1) {
+          jumpToSlide(0);
+        } else {
+          jumpToSlide(currentIndex + 1);
+        }
+      }
+
+      function goPrevInstant() {
+        if (currentIndex === 0) {
+          jumpToSlide(slides.length - 1);
+        } else {
+          jumpToSlide(currentIndex - 1);
+        }
+      }
+
+      function goNextAnimated() {
+        if (currentIndex === slides.length - 1) {
+          jumpToSlide(0);
+        } else {
+          animateToSlide(currentIndex + 1);
+        }
+      }
+
+      function goPrevAnimated() {
+        if (currentIndex === 0) {
+          jumpToSlide(slides.length - 1);
+        } else {
+          animateToSlide(currentIndex - 1);
+        }
+      }
+
+      function updateDesktopCursor(e) {
+        if (!isDesktop() || isPointerDown) return;
+
+        const rect = gallery.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+
+        gallery.style.setProperty("--cursor-x", `${x}px`);
+        gallery.style.setProperty("--cursor-y", `${y}px`);
+        gallery.classList.add("show-cursor");
+        gallery.classList.toggle("cursor-left", x < centerX);
+        gallery.classList.toggle("cursor-right", x >= centerX);
+      }
+
+      function clearDesktopCursor() {
+        gallery.classList.remove("show-cursor", "cursor-left", "cursor-right");
+      }
+
+      function animate() {
+        currentTranslate += (targetTranslate - currentTranslate) * 0.24;
+
+        if (Math.abs(targetTranslate - currentTranslate) < 0.01) {
+          currentTranslate = targetTranslate;
+        }
+
+        applyTransform();
+        requestAnimationFrame(animate);
+      }
+
+      jumpToSlide(0);
+      animate();
+
+      window.addEventListener("resize", () => {
+        jumpToSlide(currentIndex);
+
+        if (!isDesktop()) {
+          clearDesktopCursor();
+        }
       });
 
-      gallery.addEventListener("wheel", (e) => {
-        if (isMobile()) return;
-        e.preventDefault();
+      gallery.addEventListener("mouseenter", (e) => {
+        if (!isDesktop()) return;
+        updateDesktopCursor(e);
+      });
 
-        if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-          if (e.deltaX > 0) nextSlide();
-          else prevSlide();
-        } else {
-          if (e.deltaY > 0) nextSlide();
-          else prevSlide();
+      gallery.addEventListener("mouseleave", () => {
+        clearDesktopCursor();
+      });
+
+      gallery.addEventListener("mousemove", (e) => {
+        if (!isDesktop()) return;
+
+        if (isPointerDown) {
+          if (Math.abs(e.clientX - startX) > 4) {
+            hasDragged = true;
+          }
+          return;
         }
-      }, { passive: false });
+
+        updateDesktopCursor(e);
+      });
+
+      gallery.addEventListener(
+        "touchstart",
+        (e) => {
+          const x = e.touches[0].clientX;
+          startX = x;
+          lastX = x;
+          touchDirection = 0;
+        },
+        { passive: true }
+      );
+
+      gallery.addEventListener(
+        "touchmove",
+        (e) => {
+          const x = e.touches[0].clientX;
+          const dx = x - lastX;
+
+          if (dx !== 0) {
+            touchDirection = dx;
+          }
+
+          lastX = x;
+        },
+        { passive: true }
+      );
+
+      gallery.addEventListener(
+        "touchend",
+        () => {
+          const swipeDistance = lastX - startX;
+
+          if (swipeDistance < -20) {
+            goNextInstant();
+          } else if (swipeDistance > 20) {
+            goPrevInstant();
+          } else if (touchDirection < 0) {
+            goNextInstant();
+          } else if (touchDirection > 0) {
+            goPrevInstant();
+          } else {
+            jumpToSlide(currentIndex);
+          }
+        },
+        { passive: true }
+      );
 
       gallery.addEventListener("mousedown", (e) => {
-        if (isMobile()) return;
+        if (!isDesktop()) return;
+
         isPointerDown = true;
+        hasDragged = false;
         startX = e.clientX;
-        currentX = startX;
+        lastX = e.clientX;
         gallery.classList.add("is-dragging");
-        updateGallery(false);
+        clearDesktopCursor();
       });
 
-      window.addEventListener("mousemove", (e) => {
-        if (!isPointerDown || isMobile()) return;
-        currentX = e.clientX;
-      });
+      window.addEventListener("mouseup", (e) => {
+        if (!isPointerDown) return;
 
-      window.addEventListener("mouseup", () => {
-        if (!isPointerDown || isMobile()) return;
-
-        const diff = currentX - startX;
         isPointerDown = false;
         gallery.classList.remove("is-dragging");
 
-        if (diff < -60) nextSlide();
-        else if (diff > 60) prevSlide();
-        else updateGallery(true);
+        const dx = e.clientX - startX;
+
+        if (!hasDragged && isDesktop()) {
+          const rect = gallery.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const centerX = rect.width / 2;
+
+          if (x > centerX) {
+            goNextInstant();
+          } else {
+            goPrevInstant();
+          }
+        } else if (dx < -20) {
+          goNextAnimated();
+        } else if (dx > 20) {
+          goPrevAnimated();
+        } else {
+          jumpToSlide(currentIndex);
+        }
+
+        if (isDesktop()) {
+          updateDesktopCursor(e);
+        }
       });
 
-      updateGallery();
+      gallery.addEventListener("dragstart", (e) => {
+        e.preventDefault();
+      });
     });
   </script>
 </body>
