@@ -207,7 +207,7 @@ gallery.addEventListener(
     const velocity = dt > 0 ? dx / dt : 0;
 
     // base speed + velocity boost
-    const speedMultiplier = 2.6 + Math.abs(velocity) * 6;
+    const speedMultiplier = 4.6 + Math.abs(velocity) * 10;
 
     targetTranslate = clamp(
       targetTranslate - dx * speedMultiplier,
