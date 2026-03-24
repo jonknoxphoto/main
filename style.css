@@ -18,6 +18,17 @@ h1.title {
     width: 100%;
   }
 }
-.archive-grid .item:last-child img {
-  margin-bottom: 20px;
+@media (max-width: 480px) {
+  .caption {
+    position: static;          /* removes overlay */
+    transform: none;
+    margin-top: 6px;
+
+    color: #111;
+    text-shadow: none;
+  }
+
+  .frame {
+    display: block;
+  }
 }
