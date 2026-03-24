@@ -17,7 +17,7 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   }
 
   function animate() {
-    currentTranslate += (targetTranslate - currentTranslate) * 0.08;
+    currentTranslate += (targetTranslate - currentTranslate) * 0.16;
     track.style.transform = `translateX(${-currentTranslate}px)`;
     requestAnimationFrame(animate);
   }
