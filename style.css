@@ -151,14 +151,14 @@ h1.title {
 
   .gallery-track {
     align-items: center;
-    gap: 0;
+    gap: 12px;
   }
 
   .gallery .slide {
-    flex: 0 0 100%;
-    min-width: 100%;
-    width: 100%;
-    max-width: 100%;
+    flex: 0 0 calc(100% - 12px);
+    min-width: calc(100% - 12px);
+    width: calc(100% - 12px);
+    max-width: calc(100% - 12px);
     display: grid;
     justify-content: center;
     align-items: center;
