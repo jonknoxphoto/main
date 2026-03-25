@@ -159,9 +159,10 @@ h1.title {
     min-width: 100%;
     width: 100%;
     max-width: 100%;
-    display: flex;
+    display: grid;
     justify-content: center;
     align-items: center;
+    place-items: center;
   }
 
   .gallery .frame {
