@@ -1,17 +1,18 @@
 document.querySelectorAll(".gallery").forEach((gallery) => {
   const track = gallery.querySelector(".gallery-track");
-  let realSlides = Array.from(track.querySelectorAll(".slide"));
+  if (!track) return;
 
-  if (!track || realSlides.length <= 1) return;
+  const originalSlides = Array.from(track.querySelectorAll(".slide"));
+  if (originalSlides.length <= 1) return;
 
-  const firstClone = realSlides[0].cloneNode(true);
-  const lastClone = realSlides[realSlides.length - 1].cloneNode(true);
+  const firstClone = originalSlides[0].cloneNode(true);
+  const lastClone = originalSlides[originalSlides.length - 1].cloneNode(true);
 
   firstClone.classList.add("is-clone");
   lastClone.classList.add("is-clone");
 
   track.appendChild(firstClone);
-  track.insertBefore(lastClone, realSlides[0]);
+  track.insertBefore(lastClone, originalSlides[0]);
 
   const slides = Array.from(track.querySelectorAll(".slide"));
 
@@ -28,16 +29,10 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     return window.innerWidth > 480;
   }
 
-  function getGap() {
-    return parseFloat(getComputedStyle(track).gap || "0");
-  }
-
-  function getSlideWidth() {
-    return gallery.clientWidth + getGap();
-  }
-
   function getTranslateForIndex(index) {
-    return index * getSlideWidth();
+    const slide = slides[index];
+    if (!slide) return 0;
+    return slide.offsetLeft;
   }
 
   function applyTransform() {
@@ -172,7 +167,6 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
       } else {
         snapTo(currentIndex);
       }
-
       return;
     }
 
@@ -196,8 +190,8 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   window.addEventListener("mouseup", onEnd);
 
   gallery.addEventListener("touchstart", onStart, { passive: true });
-  gallery.addEventListener("touchmove", onMove, { passive: true });
-  gallery.addEventListener("touchend", onEnd, { passive: true });
+  window.addEventListener("touchmove", onMove, { passive: true });
+  window.addEventListener("touchend", onEnd, { passive: true });
 
   gallery.addEventListener("dragstart", (e) => {
     e.preventDefault();
