@@ -53,23 +53,23 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     return x;
   }
 
-  function getTranslateForIndex(index) {
-    const slide = slides[index];
-    if (!slide) return 0;
+function getTranslateForIndex(index) {
+  const slide = slides[index];
+  if (!slide) return 0;
 
-    const frame = slide.querySelector(".frame");
-    const img = slide.querySelector("img");
+  const img = slide.querySelector(".frame img");
+  const frame = slide.querySelector(".frame");
+  const target = img || frame || slide;
 
-    const target = img || frame || slide;
+  const targetCenter = target.offsetLeft + target.offsetWidth / 2;
+  const slideCenter = slide.offsetLeft + slide.offsetWidth / 2;
+  const innerOffset = targetCenter - slideCenter;
 
-    const targetLeft = getOffsetWithin(target, track);
-    const targetWidth = target.offsetWidth;
-    const targetCenter = targetLeft + targetWidth / 2;
+  const slideVisualCenter = slide.offsetLeft + slide.offsetWidth / 2 + innerOffset;
+  const galleryCenter = gallery.clientWidth / 2;
 
-    const galleryCenter = gallery.clientWidth / 2;
-
-    return targetCenter - galleryCenter;
-  }
+  return slideVisualCenter - galleryCenter;
+}
 
   function applyTransform() {
     track.style.transform = `translate3d(${-currentTranslate}px, 0, 0)`;
