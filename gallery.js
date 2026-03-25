@@ -41,9 +41,14 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     return window.innerWidth > 480;
   }
 
-  function getTranslateForIndex(index) {
-    const slide = slides[index];
-    return slide ? slide.offsetLeft : 0;
+function getTranslateForIndex(index) {
+  const slide = slides[index];
+  if (!slide) return 0;
+
+  const slideCenter = slide.offsetLeft + slide.offsetWidth / 2;
+  const galleryCenter = gallery.clientWidth / 2;
+
+  return slideCenter - galleryCenter;
   }
 
   function applyTransform() {
