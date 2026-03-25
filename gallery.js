@@ -5,14 +5,12 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   const track = gallery.querySelector(".gallery-track");
   if (!track) return;
 
-  // remove old clones
   track.querySelectorAll(".is-clone").forEach((el) => el.remove());
 
   const realSlides = Array.from(track.querySelectorAll(".slide"));
   const realCount = realSlides.length;
   if (realCount <= 1) return;
 
-  // create clones
   const firstClone = realSlides[0].cloneNode(true);
   const lastClone = realSlides[realCount - 1].cloneNode(true);
   firstClone.classList.add("is-clone");
@@ -43,18 +41,14 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     return window.innerWidth > 480;
   }
 
-  function refreshSlides() {
-    slides = Array.from(track.querySelectorAll(".slide"));
-  }
+function getTranslateForIndex(index) {
+  const slide = slides[index];
+  if (!slide) return 0;
 
-  function getTranslateForIndex(index) {
-    const slide = slides[index];
-    if (!slide) return 0;
+  const slideCenter = slide.offsetLeft + slide.offsetWidth / 2;
+  const galleryCenter = gallery.clientWidth / 2;
 
-    const slideCenter = slide.offsetLeft + slide.offsetWidth / 2;
-    const galleryCenter = gallery.clientWidth / 2;
-
-    return slideCenter - galleryCenter;
+  return slideCenter - galleryCenter;
   }
 
   function applyTransform() {
@@ -222,6 +216,7 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     }
 
     const dx = getClientX(e) - startX;
+    const absDx = Math.abs(dx);
     const threshold = gallery.clientWidth * (isDesktop() ? 0.12 : 0.1);
     const flickVelocity = 0.45;
 
@@ -256,15 +251,6 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     velocityX = 0;
   }
 
-  function forceLayoutAndCenter(index = currentIndex) {
-    refreshSlides();
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        instantJumpTo(index);
-      });
-    });
-  }
-
   gallery.addEventListener("mouseenter", updateDesktopCursor);
   gallery.addEventListener("mousemove", updateDesktopCursor);
   gallery.addEventListener("mouseleave", clearDesktopCursor);
@@ -283,45 +269,11 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   });
 
   window.addEventListener("resize", () => {
-    forceLayoutAndCenter(currentIndex);
+    slides = Array.from(track.querySelectorAll(".slide"));
+    instantJumpTo(currentIndex);
     if (!isDesktop()) clearDesktopCursor();
   });
 
-  // re-center after all images in this gallery have loaded
-  const imgs = gallery.querySelectorAll("img");
-  let remaining = imgs.length;
-
-  if (remaining === 0) {
-    forceLayoutAndCenter(1);
-  } else {
-    imgs.forEach((img) => {
-      if (img.complete) {
-        remaining -= 1;
-      } else {
-        img.addEventListener(
-          "load",
-          () => {
-            remaining -= 1;
-            if (remaining <= 0) forceLayoutAndCenter(1);
-          },
-          { once: true }
-        );
-
-        img.addEventListener(
-          "error",
-          () => {
-            remaining -= 1;
-            if (remaining <= 0) forceLayoutAndCenter(1);
-          },
-          { once: true }
-        );
-      }
-    });
-
-    if (remaining <= 0) {
-      forceLayoutAndCenter(1);
-    }
-  }
-
+  instantJumpTo(1);
   animate();
 });
