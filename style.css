@@ -100,21 +100,12 @@ h1.title {
   overflow: hidden;
 }
 
-/* DEFAULT (vertical images) */
 .gallery .frame img {
   max-width: 100%;
   max-height: 100%;
   width: auto;
   height: auto;
   object-fit: contain;
-}
-
-/* HORIZONTAL IMAGES */
-.gallery .frame img.is-horizontal {
-  max-width: 100%;   /* fill width */
-  max-height: 100%;
-  width: auto;
-  height: auto;
 }
 .gallery .caption {
   position: static;
