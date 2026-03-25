@@ -32,9 +32,10 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     return parseFloat(getComputedStyle(track).gap || "0");
   }
 
-  function getSlideWidth() {
-    return gallery.clientWidth + getGap();
-  }
+function getSlideWidth() {
+  const slide = slides[currentIndex] || slides[0];
+  return slide.getBoundingClientRect().width + getGap();
+}
 
   function getTranslateForIndex(index) {
     return index * getSlideWidth();
