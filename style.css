@@ -78,9 +78,7 @@ h1.title {
   pointer-events: none;
 }
 
-/* ================= MOBILE ================= */
 @media (max-width: 480px) {
-
   .page {
     padding-left: 12px;
     padding-right: 12px;
@@ -104,7 +102,6 @@ h1.title {
     align-items: flex-start;
   }
 
-  /* ✅ REAL 20px gap between images */
   .gallery .slide {
     flex: 0 0 calc(100% - 20px);
     min-width: calc(100% - 20px);
@@ -123,25 +120,24 @@ h1.title {
     margin-right: 0;
   }
 
-  /* stack image + caption */
   .gallery .frame {
     width: 100%;
     max-width: 100%;
+    min-height: 0;
     display: flex;
     justify-content: center;
     align-items: center;
   }
 
-  /* ✅ IMAGE ALWAYS FITS MOBILE SCREEN */
   .gallery .frame img,
   .archive-grid img {
-    display: block;
-    width: auto;
-    height: auto;
-    max-width: 100%;
-    max-height: calc(100dvh - 180px);
-    object-fit: contain;
-    margin: 0 auto;
+    display: block !important;
+    width: 100% !important;
+    height: auto !important;
+    max-width: 100% !important;
+    max-height: 40dvh !important;
+    object-fit: contain !important;
+    margin: 0 auto !important;
   }
 
   .gallery .caption {
