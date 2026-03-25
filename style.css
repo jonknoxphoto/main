@@ -92,7 +92,7 @@ h1.title {
   align-items: center;
 }
 
-/* FRAME stays centered */
+/* FRAME */
 .gallery .frame {
   width: 100%;
   height: 70vh;
@@ -100,14 +100,20 @@ h1.title {
   justify-content: center;
   align-items: center;
   overflow: hidden;
+  position: relative;
 }
 
 .gallery .frame img {
-  max-width: 100%;
-  max-height: 100%;
+  display: block;
   width: auto;
   height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  margin: auto;
   object-fit: contain;
+  object-position: center center;
+  align-self: center;
+  justify-self: center;
 }
 
 .gallery .caption {
@@ -165,7 +171,6 @@ h1.title {
     min-width: calc(100% - 12px);
     width: calc(100% - 12px);
     max-width: calc(100% - 12px);
-
     height: 100svh;
     position: relative;
     display: flex;
@@ -177,9 +182,10 @@ h1.title {
     width: 100%;
     height: 60vh;
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
     overflow: hidden;
+    position: relative;
   }
 
   .gallery .frame img {
@@ -188,8 +194,11 @@ h1.title {
     height: auto;
     max-width: 100%;
     max-height: 100%;
-    margin: 0;
+    margin: auto;
     object-fit: contain;
+    object-position: center center;
+    align-self: center;
+    justify-self: center;
   }
 
   .gallery .caption {
