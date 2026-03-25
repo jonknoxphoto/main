@@ -5,14 +5,12 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   const track = gallery.querySelector(".gallery-track");
   if (!track) return;
 
-  // remove any stale clones before rebuilding
   track.querySelectorAll(".is-clone").forEach((el) => el.remove());
 
   const realSlides = Array.from(track.querySelectorAll(".slide"));
   const realCount = realSlides.length;
   if (realCount <= 1) return;
 
-  // create loop clones
   const firstClone = realSlides[0].cloneNode(true);
   const lastClone = realSlides[realCount - 1].cloneNode(true);
   firstClone.classList.add("is-clone");
@@ -23,14 +21,21 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
 
   let slides = Array.from(track.querySelectorAll(".slide"));
 
-  let currentIndex = 1; // first real slide
+  let currentIndex = 1;
   let currentTranslate = 0;
   let targetTranslate = 0;
 
   let isPointerDown = false;
   let isDragging = false;
+  let isScrollingY = false;
+
   let startX = 0;
+  let startY = 0;
   let startTranslate = 0;
+
+  let lastMoveX = 0;
+  let lastMoveTime = 0;
+  let velocityX = 0;
 
   function isDesktop() {
     return window.innerWidth > 480;
@@ -83,7 +88,7 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
 
   function goNext() {
     if (currentIndex >= realCount) {
-      setIndex(realCount + 1); // first clone
+      setIndex(realCount + 1);
     } else {
       setIndex(currentIndex + 1);
     }
@@ -91,7 +96,7 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
 
   function goPrev() {
     if (currentIndex <= 1) {
-      setIndex(0); // last clone
+      setIndex(0);
     } else {
       setIndex(currentIndex - 1);
     }
@@ -110,9 +115,9 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
 
   function animate() {
     if (!isDragging) {
-      currentTranslate += (targetTranslate - currentTranslate) * 0.16;
+      currentTranslate += (targetTranslate - currentTranslate) * 0.14;
 
-      if (Math.abs(targetTranslate - currentTranslate) < 0.5) {
+      if (Math.abs(targetTranslate - currentTranslate) < 0.35) {
         currentTranslate = targetTranslate;
         applyTransform();
         normalizeLoopPosition();
@@ -130,11 +135,24 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     return e.clientX;
   }
 
+  function getClientY(e) {
+    if (e.touches && e.touches.length) return e.touches[0].clientY;
+    if (e.changedTouches && e.changedTouches.length) return e.changedTouches[0].clientY;
+    return e.clientY;
+  }
+
   function onStart(e) {
     isPointerDown = true;
     isDragging = false;
+    isScrollingY = false;
+
     startX = getClientX(e);
+    startY = getClientY(e);
     startTranslate = currentTranslate;
+
+    lastMoveX = startX;
+    lastMoveTime = performance.now();
+    velocityX = 0;
 
     gallery.classList.add("is-dragging");
     clearDesktopCursor();
@@ -146,14 +164,36 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
       return;
     }
 
-    const dx = getClientX(e) - startX;
+    const x = getClientX(e);
+    const y = getClientY(e);
+    const dx = x - startX;
+    const dy = y - startY;
 
-    if (Math.abs(dx) > 4) {
-      isDragging = true;
+    if (!isDragging && !isScrollingY) {
+      if (Math.abs(dy) > 8 && Math.abs(dy) > Math.abs(dx)) {
+        isScrollingY = true;
+        gallery.classList.remove("is-dragging");
+        return;
+      }
+
+      if (Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy)) {
+        isDragging = true;
+      }
     }
 
+    if (isScrollingY) return;
+
     if (isDragging) {
-      currentTranslate = startTranslate - dx;
+      const now = performance.now();
+      const dt = now - lastMoveTime || 1;
+
+      velocityX = (x - lastMoveX) / dt;
+
+      lastMoveX = x;
+      lastMoveTime = now;
+
+      const dragResistance = isDesktop() ? 1 : 0.92;
+      currentTranslate = startTranslate - dx * dragResistance;
       applyTransform();
     }
   }
@@ -164,8 +204,16 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     isPointerDown = false;
     gallery.classList.remove("is-dragging");
 
+    if (isScrollingY) {
+      isDragging = false;
+      isScrollingY = false;
+      return;
+    }
+
     const dx = getClientX(e) - startX;
-    const threshold = gallery.clientWidth * 0.12;
+    const absDx = Math.abs(dx);
+    const threshold = gallery.clientWidth * (isDesktop() ? 0.12 : 0.1);
+    const flickVelocity = 0.45;
 
     if (!isDragging) {
       if (isDesktop() && e.clientX !== undefined) {
@@ -185,15 +233,17 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
       return;
     }
 
-    if (dx < -threshold) {
+    if (dx < -threshold || velocityX < -flickVelocity) {
       goNext();
-    } else if (dx > threshold) {
+    } else if (dx > threshold || velocityX > flickVelocity) {
       goPrev();
     } else {
       setIndex(currentIndex);
     }
 
     isDragging = false;
+    isScrollingY = false;
+    velocityX = 0;
   }
 
   gallery.addEventListener("mouseenter", updateDesktopCursor);
@@ -207,6 +257,7 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   gallery.addEventListener("touchstart", onStart, { passive: true });
   window.addEventListener("touchmove", onMove, { passive: true });
   window.addEventListener("touchend", onEnd, { passive: true });
+  window.addEventListener("touchcancel", onEnd, { passive: true });
 
   gallery.addEventListener("dragstart", (e) => {
     e.preventDefault();
@@ -221,4 +272,3 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   instantJumpTo(1);
   animate();
 });
-
