@@ -73,8 +73,8 @@ h1.title {
   transform: translateX(0);
 }
 
-/* EACH SLIDE = WHOLE ITEM */
-.gallery .item {
+/* EACH SLIDE */
+.gallery .slide {
   flex: 0 0 100%;
   min-width: 100%;
   width: 100%;
@@ -154,14 +154,13 @@ h1.title {
   }
 
   .gallery-track {
-    gap: 00;
+    gap: 17px;
   }
 
-  .gallery .item {
+  .gallery .slide {
     flex: 0 0 100%;
     min-width: 100%;
     width: 100%;
-    padding: 20;
   }
 
   .gallery .frame {
