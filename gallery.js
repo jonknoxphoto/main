@@ -5,11 +5,32 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   const track = gallery.querySelector(".gallery-track");
   if (!track) return;
 
+  // force vertical centering instead of top alignment
+  gallery.style.display = "flex";
+  gallery.style.alignItems = "center";
+
+  track.style.display = "flex";
+  track.style.alignItems = "center";
+
   track.querySelectorAll(".is-clone").forEach((el) => el.remove());
 
   const realSlides = Array.from(track.querySelectorAll(".slide"));
   const realCount = realSlides.length;
   if (realCount <= 1) return;
+
+  // force each slide/frame to center its image content
+  realSlides.forEach((slide) => {
+    slide.style.display = "flex";
+    slide.style.alignItems = "center";
+    slide.style.justifyContent = "center";
+
+    const frame = slide.querySelector(".frame");
+    if (frame) {
+      frame.style.display = "flex";
+      frame.style.alignItems = "center";
+      frame.style.justifyContent = "center";
+    }
+  });
 
   const firstClone = realSlides[0].cloneNode(true);
   const lastClone = realSlides[realCount - 1].cloneNode(true);
@@ -20,6 +41,21 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   track.insertBefore(lastClone, realSlides[0]);
 
   let slides = Array.from(track.querySelectorAll(".slide"));
+
+  // apply centering to clones too
+  slides.forEach((slide) => {
+    slide.style.display = "flex";
+    slide.style.alignItems = "center";
+    slide.style.justifyContent = "center";
+
+    const frame = slide.querySelector(".frame");
+    if (frame) {
+      frame.style.display = "flex";
+      frame.style.alignItems = "center";
+      frame.style.justifyContent = "center";
+    }
+  });
+
   let currentIndex = 1;
   let currentTranslate = 0;
   let targetTranslate = 0;
@@ -145,6 +181,20 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
 
   window.addEventListener("resize", () => {
     slides = Array.from(track.querySelectorAll(".slide"));
+
+    slides.forEach((slide) => {
+      slide.style.display = "flex";
+      slide.style.alignItems = "center";
+      slide.style.justifyContent = "center";
+
+      const frame = slide.querySelector(".frame");
+      if (frame) {
+        frame.style.display = "flex";
+        frame.style.alignItems = "center";
+        frame.style.justifyContent = "center";
+      }
+    });
+
     instantJumpTo(currentIndex);
   });
 
