@@ -77,8 +77,9 @@ h1.title {
 
 /* ---------------- MOBILE ---------------- */
 @media (max-width: 480px) {
-
   .page {
+    width: 100%;
+    max-width: 100%;
     padding: 18px 14px 42px;
     overflow-x: hidden;
   }
@@ -86,45 +87,57 @@ h1.title {
   .archive-grid {
     display: block;
     width: 100%;
+    max-width: 100%;
   }
 
   .gallery {
-    cursor: auto;
     width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    cursor: auto;
+  }
+
+  .gallery::after {
+    display: none;
   }
 
   .gallery-track {
     gap: 0;
+    width: 100%;
   }
 
-  .gallery .item {
+  .gallery .slide {
     flex: 0 0 100%;
     min-width: 100%;
     width: 100%;
+    max-width: 100%;
   }
 
   .gallery .frame {
     width: 100%;
+    max-width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     overflow: hidden;
   }
 
-  /* 🔥 KEY AUTO-FIT RULE */
   .gallery .frame img,
   .archive-grid img {
     display: block;
-
-    width: auto;          /* do NOT force width */
-    height: auto;         /* do NOT force height */
-
-    max-width: 100%;      /* never overflow horizontally */
-    max-height: 75vh;     /* never overflow vertically */
-
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 68vh;
     object-fit: contain;
     margin: 0 auto;
   }
 
   .gallery .caption {
     width: 100%;
+    margin-top: 8px;
+    text-align: left;
+    align-items: flex-start;
     font-size: 9px;
   }
 }
