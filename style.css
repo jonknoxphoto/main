@@ -92,17 +92,17 @@ h1.title {
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow: hidden;
 }
 
 /* IMAGE */
 .gallery .frame img {
   display: block;
-  width: auto;
-  height: 70vh;
+  width: 100%;
+  height: 100%;
   max-width: 100%;
-  max-height: 70vh;
-  margin: 0 auto;
   object-fit: contain;
+  margin: 0 auto;
 }
 
 /* CAPTION UNDER IMAGE */
@@ -154,7 +154,7 @@ h1.title {
 
   .gallery-track {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 12px;
   }
 
@@ -168,8 +168,8 @@ h1.title {
 
   .gallery .frame {
     width: 100%;
-    min-height: 70vh;
-    display: flex;
+    height: 62svh;   /* important */
+    max-height: 62svh;
     justify-content: center;
     align-items: center;
     overflow: hidden;
@@ -177,13 +177,13 @@ h1.title {
 
   .gallery .frame img,
   .archive-grid img {
-    display: block;
     width: 100%;
-    height: auto;
+    height: 100%;
     max-width: 100%;
-    max-height: 70vh;
+    max-height: 100%;
     object-fit: contain;
     margin: 0 auto;
+    display: block;
   }
 
   .gallery .caption {
