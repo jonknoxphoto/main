@@ -14,6 +14,48 @@ h1.title {
   line-height: 0.95;
   color: #111;
 }
+.site-header {
+  position: relative;
+  width: 100%;
+  padding: 18px 24px;
+  border-bottom: 1px solid #ccc;
+}
+
+.header-inner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* LEFT */
+.header-left {
+  font-size: 12px;
+  letter-spacing: 0.12em;
+}
+
+/* RIGHT NAV */
+.header-right {
+  display: flex;
+  gap: 24px;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+}
+
+.header-right a {
+  text-decoration: none;
+  color: #111;
+}
+
+/* CENTER NAME (this is the magic) */
+.header-center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 14px;
+  letter-spacing: 0.18em;
+  white-space: nowrap;
+}
 
 .archive-grid {
   display: grid;
