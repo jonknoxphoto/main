@@ -221,3 +221,19 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   instantJumpTo(1);
   animate();
 });
+// ORIENTATION DETECTION
+document.querySelectorAll(".gallery .frame img").forEach((img) => {
+  function checkOrientation() {
+    if (img.naturalWidth > img.naturalHeight) {
+      img.classList.add("is-horizontal");
+    } else {
+      img.classList.remove("is-horizontal");
+    }
+  }
+
+  if (img.complete) {
+    checkOrientation();
+  } else {
+    img.addEventListener("load", checkOrientation);
+  }
+});
