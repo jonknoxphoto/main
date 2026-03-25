@@ -5,32 +5,11 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   const track = gallery.querySelector(".gallery-track");
   if (!track) return;
 
-  // force vertical centering instead of top alignment
-  gallery.style.display = "flex";
-  gallery.style.alignItems = "center";
-
-  track.style.display = "flex";
-  track.style.alignItems = "center";
-
   track.querySelectorAll(".is-clone").forEach((el) => el.remove());
 
   const realSlides = Array.from(track.querySelectorAll(".slide"));
   const realCount = realSlides.length;
   if (realCount <= 1) return;
-
-  // force each slide/frame to center its image content
-  realSlides.forEach((slide) => {
-    slide.style.display = "flex";
-    slide.style.alignItems = "center";
-    slide.style.justifyContent = "center";
-
-    const frame = slide.querySelector(".frame");
-    if (frame) {
-      frame.style.display = "flex";
-      frame.style.alignItems = "center";
-      frame.style.justifyContent = "center";
-    }
-  });
 
   const firstClone = realSlides[0].cloneNode(true);
   const lastClone = realSlides[realCount - 1].cloneNode(true);
@@ -42,46 +21,57 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
 
   let slides = Array.from(track.querySelectorAll(".slide"));
 
-  // apply centering to clones too
-  slides.forEach((slide) => {
-    slide.style.display = "flex";
-    slide.style.alignItems = "center";
-    slide.style.justifyContent = "center";
-
-    const frame = slide.querySelector(".frame");
-    if (frame) {
-      frame.style.display = "flex";
-      frame.style.alignItems = "center";
-      frame.style.justifyContent = "center";
-    }
-  });
-
   let currentIndex = 1;
   let currentTranslate = 0;
   let targetTranslate = 0;
 
   let isPointerDown = false;
   let isDragging = false;
+  let isScrollingY = false;
+
   let startX = 0;
+  let startY = 0;
   let startTranslate = 0;
 
-  function getClientX(e) {
-    if (e.touches && e.touches.length) return e.touches[0].clientX;
-    if (e.changedTouches && e.changedTouches.length) return e.changedTouches[0].clientX;
-    return e.clientX;
+  let lastMoveX = 0;
+  let lastMoveTime = 0;
+  let velocityX = 0;
+
+  function isDesktop() {
+    return window.innerWidth > 480;
   }
 
-  function getTranslateForIndex(index) {
-    const slide = slides[index];
-    if (!slide) return 0;
+function getTranslateForIndex(index) {
+  const slide = slides[index];
+  if (!slide) return 0;
 
-    const slideCenter = slide.offsetLeft + slide.offsetWidth / 2;
-    const galleryCenter = gallery.clientWidth / 2;
-    return slideCenter - galleryCenter;
+  const slideCenter = slide.offsetLeft + slide.offsetWidth / 2;
+  const galleryCenter = gallery.clientWidth / 2;
+
+  return slideCenter - galleryCenter;
   }
 
   function applyTransform() {
     track.style.transform = `translate3d(${-currentTranslate}px, 0, 0)`;
+  }
+
+  function updateDesktopCursor(e) {
+    if (!isDesktop() || isPointerDown || e.clientX === undefined) return;
+
+    const rect = gallery.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+
+    gallery.style.setProperty("--cursor-x", `${x}px`);
+    gallery.style.setProperty("--cursor-y", `${y}px`);
+    gallery.classList.add("show-cursor");
+    gallery.classList.toggle("cursor-left", x < centerX);
+    gallery.classList.toggle("cursor-right", x >= centerX);
+  }
+
+  function clearDesktopCursor() {
+    gallery.classList.remove("show-cursor", "cursor-left", "cursor-right");
   }
 
   function setIndex(index, immediate = false) {
@@ -102,16 +92,30 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   }
 
   function goNext() {
-    setIndex(currentIndex >= realCount ? realCount + 1 : currentIndex + 1);
+    if (currentIndex >= realCount) {
+      setIndex(realCount + 1);
+    } else {
+      setIndex(currentIndex + 1);
+    }
   }
 
   function goPrev() {
-    setIndex(currentIndex <= 1 ? 0 : currentIndex - 1);
+    if (currentIndex <= 1) {
+      setIndex(0);
+    } else {
+      setIndex(currentIndex - 1);
+    }
   }
 
   function normalizeLoopPosition() {
-    if (currentIndex === 0) instantJumpTo(realCount);
-    if (currentIndex === realCount + 1) instantJumpTo(1);
+    if (currentIndex === 0) {
+      instantJumpTo(realCount);
+      return;
+    }
+
+    if (currentIndex === realCount + 1) {
+      instantJumpTo(1);
+    }
   }
 
   function animate() {
@@ -130,46 +134,126 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     requestAnimationFrame(animate);
   }
 
+  function getClientX(e) {
+    if (e.touches && e.touches.length) return e.touches[0].clientX;
+    if (e.changedTouches && e.changedTouches.length) return e.changedTouches[0].clientX;
+    return e.clientX;
+  }
+
+  function getClientY(e) {
+    if (e.touches && e.touches.length) return e.touches[0].clientY;
+    if (e.changedTouches && e.changedTouches.length) return e.changedTouches[0].clientY;
+    return e.clientY;
+  }
+
   function onStart(e) {
     isPointerDown = true;
     isDragging = false;
+    isScrollingY = false;
+
     startX = getClientX(e);
+    startY = getClientY(e);
     startTranslate = currentTranslate;
+
+    lastMoveX = startX;
+    lastMoveTime = performance.now();
+    velocityX = 0;
+
+    gallery.classList.add("is-dragging");
+    clearDesktopCursor();
   }
 
   function onMove(e) {
-    if (!isPointerDown) return;
+    if (!isPointerDown) {
+      updateDesktopCursor(e);
+      return;
+    }
 
-    const dx = getClientX(e) - startX;
+    const x = getClientX(e);
+    const y = getClientY(e);
+    const dx = x - startX;
+    const dy = y - startY;
 
-    if (Math.abs(dx) > 8) isDragging = true;
+    if (!isDragging && !isScrollingY) {
+      if (Math.abs(dy) > 8 && Math.abs(dy) > Math.abs(dx)) {
+        isScrollingY = true;
+        gallery.classList.remove("is-dragging");
+        return;
+      }
+
+      if (Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy)) {
+        isDragging = true;
+      }
+    }
+
+    if (isScrollingY) return;
 
     if (isDragging) {
-      currentTranslate = startTranslate - dx;
+      const now = performance.now();
+      const dt = now - lastMoveTime || 1;
+
+      velocityX = (x - lastMoveX) / dt;
+
+      lastMoveX = x;
+      lastMoveTime = now;
+
+      const dragResistance = isDesktop() ? 1 : 0.92;
+      currentTranslate = startTranslate - dx * dragResistance;
       applyTransform();
     }
   }
 
   function onEnd(e) {
     if (!isPointerDown) return;
+
     isPointerDown = false;
+    gallery.classList.remove("is-dragging");
+
+    if (isScrollingY) {
+      isDragging = false;
+      isScrollingY = false;
+      return;
+    }
 
     const dx = getClientX(e) - startX;
-    const threshold = gallery.clientWidth * 0.12;
+    const absDx = Math.abs(dx);
+    const threshold = gallery.clientWidth * (isDesktop() ? 0.12 : 0.1);
+    const flickVelocity = 0.45;
 
-    if (isDragging) {
-      if (dx < -threshold) goNext();
-      else if (dx > threshold) goPrev();
-      else setIndex(currentIndex);
+    if (!isDragging) {
+      if (isDesktop() && e.clientX !== undefined) {
+        const rect = gallery.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+
+        if (clickX > rect.width / 2) {
+          goNext();
+        } else {
+          goPrev();
+        }
+
+        updateDesktopCursor(e);
+      } else {
+        setIndex(currentIndex);
+      }
+      return;
+    }
+
+    if (dx < -threshold || velocityX < -flickVelocity) {
+      goNext();
+    } else if (dx > threshold || velocityX > flickVelocity) {
+      goPrev();
     } else {
-      const rect = gallery.getBoundingClientRect();
-      const clickX = getClientX(e) - rect.left;
-      if (clickX > rect.width / 2) goNext();
-      else goPrev();
+      setIndex(currentIndex);
     }
 
     isDragging = false;
+    isScrollingY = false;
+    velocityX = 0;
   }
+
+  gallery.addEventListener("mouseenter", updateDesktopCursor);
+  gallery.addEventListener("mousemove", updateDesktopCursor);
+  gallery.addEventListener("mouseleave", clearDesktopCursor);
 
   gallery.addEventListener("mousedown", onStart);
   window.addEventListener("mousemove", onMove);
@@ -178,24 +262,16 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   gallery.addEventListener("touchstart", onStart, { passive: true });
   window.addEventListener("touchmove", onMove, { passive: true });
   window.addEventListener("touchend", onEnd, { passive: true });
+  window.addEventListener("touchcancel", onEnd, { passive: true });
+
+  gallery.addEventListener("dragstart", (e) => {
+    e.preventDefault();
+  });
 
   window.addEventListener("resize", () => {
     slides = Array.from(track.querySelectorAll(".slide"));
-
-    slides.forEach((slide) => {
-      slide.style.display = "flex";
-      slide.style.alignItems = "center";
-      slide.style.justifyContent = "center";
-
-      const frame = slide.querySelector(".frame");
-      if (frame) {
-        frame.style.display = "flex";
-        frame.style.alignItems = "center";
-        frame.style.justifyContent = "center";
-      }
-    });
-
     instantJumpTo(currentIndex);
+    if (!isDesktop()) clearDesktopCursor();
   });
 
   instantJumpTo(1);
