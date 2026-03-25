@@ -1,10 +1,21 @@
 document.querySelectorAll(".gallery").forEach((gallery) => {
   const track = gallery.querySelector(".gallery-track");
+  let realSlides = Array.from(track.querySelectorAll(".slide"));
+
+  if (!track || realSlides.length <= 1) return;
+
+  const firstClone = realSlides[0].cloneNode(true);
+  const lastClone = realSlides[realSlides.length - 1].cloneNode(true);
+
+  firstClone.classList.add("is-clone");
+  lastClone.classList.add("is-clone");
+
+  track.appendChild(firstClone);
+  track.insertBefore(lastClone, realSlides[0]);
+
   const slides = Array.from(track.querySelectorAll(".slide"));
 
-  if (!track || slides.length <= 1) return;
-
-  let currentIndex = 0;
+  let currentIndex = 1;
   let currentTranslate = 0;
   let targetTranslate = 0;
 
@@ -17,10 +28,6 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     return window.innerWidth > 480;
   }
 
-  function clamp(value, min, max) {
-    return Math.max(min, Math.min(value, max));
-  }
-
   function getGap() {
     return parseFloat(getComputedStyle(track).gap || "0");
   }
@@ -30,7 +37,7 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   }
 
   function getTranslateForIndex(index) {
-    return clamp(index, 0, slides.length - 1) * getSlideWidth();
+    return index * getSlideWidth();
   }
 
   function applyTransform() {
@@ -57,7 +64,7 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   }
 
   function snapTo(index, immediate = false) {
-    currentIndex = clamp(index, 0, slides.length - 1);
+    currentIndex = index;
     targetTranslate = getTranslateForIndex(currentIndex);
 
     if (immediate) {
@@ -66,19 +73,28 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     }
   }
 
+  function instantJumpTo(index) {
+    currentIndex = index;
+    currentTranslate = getTranslateForIndex(currentIndex);
+    targetTranslate = currentTranslate;
+    applyTransform();
+  }
+
   function goNext() {
-    if (currentIndex >= slides.length - 1) {
-      snapTo(0);
-    } else {
-      snapTo(currentIndex + 1);
-    }
+    snapTo(currentIndex + 1);
   }
 
   function goPrev() {
-    if (currentIndex <= 0) {
-      snapTo(slides.length - 1);
-    } else {
-      snapTo(currentIndex - 1);
+    snapTo(currentIndex - 1);
+  }
+
+  function normalizeLoopPosition() {
+    const lastIndex = slides.length - 1;
+
+    if (currentIndex === 0) {
+      instantJumpTo(lastIndex - 1);
+    } else if (currentIndex === lastIndex) {
+      instantJumpTo(1);
     }
   }
 
@@ -88,9 +104,11 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
 
       if (Math.abs(targetTranslate - currentTranslate) < 0.25) {
         currentTranslate = targetTranslate;
+        applyTransform();
+        normalizeLoopPosition();
+      } else {
+        applyTransform();
       }
-
-      applyTransform();
     }
 
     requestAnimationFrame(animate);
@@ -106,7 +124,7 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     isPointerDown = true;
     isDragging = false;
     startX = getClientX(e);
-    startTranslate = targetTranslate;
+    startTranslate = currentTranslate;
 
     gallery.classList.add("is-dragging");
     clearDesktopCursor();
@@ -186,10 +204,10 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   });
 
   window.addEventListener("resize", () => {
-    snapTo(currentIndex, true);
+    instantJumpTo(currentIndex);
     if (!isDesktop()) clearDesktopCursor();
   });
 
-  snapTo(0, true);
+  instantJumpTo(1);
   animate();
 });
