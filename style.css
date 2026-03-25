@@ -110,18 +110,9 @@ h1.title {
 
 /* MOBILE */
 @media (max-width: 480px) {
-  .gallery {
-    cursor: auto;
-    overflow: hidden;
-  }
-
-  .gallery::after {
-    display: none;
-  }
-
   .gallery-track {
     display: flex !important;
-    align-items: center!important;
+    align-items: center !important; /* was flex-start */
     gap: 12px !important;
     width: 100% !important;
   }
@@ -131,15 +122,20 @@ h1.title {
     min-width: calc(100% - 12px) !important;
     width: calc(100% - 12px) !important;
     max-width: calc(100% - 12px) !important;
-    position: relative !important;
-    display: block !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
   }
 
   .gallery .frame {
     width: 100% !important;
     height: 60vh !important;
-    position: relative !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: flex-start !important; /* keep this if you want top-weighted image inside frame */
     overflow: hidden !important;
+    position: relative !important;
   }
 
   .gallery .frame img {
@@ -148,16 +144,14 @@ h1.title {
     height: auto !important;
     max-width: 100% !important;
     max-height: none !important;
-    margin: 0 auto !important;
+    margin: 0 !important;
     object-fit: contain !important;
   }
 
   .gallery .caption {
-    position: absolute !important;
-    left: 0 !important;
-    top: calc(60vh + 8px) !important;
+    position: static !important;
     width: 100% !important;
-    margin: 0 !important;
+    margin-top: 8px !important;
     text-align: left !important;
     align-items: flex-start !important;
     font-size: 9px !important;
