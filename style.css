@@ -148,3 +148,21 @@ h1.title {
     margin-bottom: 20px;
   }
 }
+
+@media (max-width: 480px) {
+  .gallery .slide {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+
+  .gallery .frame {
+    flex: 0 0 50dvh !important;
+    height: 50dvh !important;
+    max-height: 50dvh !important;
+  }
+
+  .gallery .caption {
+    flex: 0 0 auto !important;
+  }
+}
