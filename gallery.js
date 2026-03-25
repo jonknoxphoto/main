@@ -1,18 +1,20 @@
 document.querySelectorAll(".gallery").forEach((gallery) => {
   const track = gallery.querySelector(".gallery-track");
-  const slides = Array.from(track.querySelectorAll(".item"));
+  const slides = Array.from(track.querySelectorAll(".slide"));
 
   if (!track || slides.length <= 1) return;
-
-  let isPointerDown = false;
-  let hasDragged = false;
-
-  let startX = 0;
-  let lastX = 0;
 
   let currentIndex = 0;
   let currentTranslate = 0;
   let targetTranslate = 0;
+
+  let isPointerDown = false;
+  let isDragging = false;
+  let startX = 0;
+  let startTranslate = 0;
+  let pointerX = 0;
+
+  let animationFrame = null;
 
   function isDesktop() {
     return window.innerWidth > 480;
@@ -26,48 +28,20 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     return parseFloat(getComputedStyle(track).gap || "0");
   }
 
-  function getSlideTranslate(index) {
-    const safeIndex = clamp(index, 0, slides.length - 1);
-    const slideWidth = gallery.clientWidth;
-    const gap = getGap();
-    return safeIndex * (slideWidth + gap);
+  function getSlideWidth() {
+    return gallery.clientWidth + getGap();
+  }
+
+  function getTranslateForIndex(index) {
+    return clamp(index, 0, slides.length - 1) * getSlideWidth();
   }
 
   function applyTransform() {
-    track.style.transform = `translateX(${-currentTranslate}px)`;
-  }
-
-  function jumpToSlide(index) {
-    currentIndex = clamp(index, 0, slides.length - 1);
-    const translate = getSlideTranslate(currentIndex);
-    currentTranslate = translate;
-    targetTranslate = translate;
-    applyTransform();
-  }
-
-  function animateToSlide(index) {
-    currentIndex = clamp(index, 0, slides.length - 1);
-    targetTranslate = getSlideTranslate(currentIndex);
-  }
-
-  function goNext() {
-    if (currentIndex === slides.length - 1) {
-      animateToSlide(0);
-    } else {
-      animateToSlide(currentIndex + 1);
-    }
-  }
-
-  function goPrev() {
-    if (currentIndex === 0) {
-      animateToSlide(slides.length - 1);
-    } else {
-      animateToSlide(currentIndex - 1);
-    }
+    track.style.transform = `translate3d(${-currentTranslate}px, 0, 0)`;
   }
 
   function updateDesktopCursor(e) {
-    if (!isDesktop() || isPointerDown) return;
+    if (!isDesktop() || isPointerDown || e.clientX === undefined) return;
 
     const rect = gallery.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -85,24 +59,120 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     gallery.classList.remove("show-cursor", "cursor-left", "cursor-right");
   }
 
-  function animate() {
-    currentTranslate += (targetTranslate - currentTranslate) * 0.18;
+  function snapTo(index, immediate = false) {
+    currentIndex = clamp(index, 0, slides.length - 1);
+    targetTranslate = getTranslateForIndex(currentIndex);
 
-    if (Math.abs(targetTranslate - currentTranslate) < 0.5) {
+    if (immediate) {
       currentTranslate = targetTranslate;
+      applyTransform();
     }
-
-    applyTransform();
-    requestAnimationFrame(animate);
   }
 
-  jumpToSlide(0);
-  animate();
+  function goNext() {
+    if (currentIndex >= slides.length - 1) {
+      snapTo(0);
+    } else {
+      snapTo(currentIndex + 1);
+    }
+  }
 
-  window.addEventListener("resize", () => {
-    jumpToSlide(currentIndex);
-    if (!isDesktop()) clearDesktopCursor();
-  });
+  function goPrev() {
+    if (currentIndex <= 0) {
+      snapTo(slides.length - 1);
+    } else {
+      snapTo(currentIndex - 1);
+    }
+  }
+
+  function animate() {
+    if (!isDragging) {
+      currentTranslate += (targetTranslate - currentTranslate) * 0.14;
+
+      if (Math.abs(targetTranslate - currentTranslate) < 0.25) {
+        currentTranslate = targetTranslate;
+      }
+
+      applyTransform();
+    }
+
+    animationFrame = requestAnimationFrame(animate);
+  }
+
+  function getClientX(e) {
+    if (e.touches && e.touches.length) return e.touches[0].clientX;
+    if (e.changedTouches && e.changedTouches.length) return e.changedTouches[0].clientX;
+    return e.clientX;
+  }
+
+  function onStart(e) {
+    isPointerDown = true;
+    isDragging = false;
+    startX = getClientX(e);
+    pointerX = startX;
+    startTranslate = targetTranslate;
+
+    gallery.classList.add("is-dragging");
+    clearDesktopCursor();
+  }
+
+  function onMove(e) {
+    if (!isPointerDown) {
+      updateDesktopCursor(e);
+      return;
+    }
+
+    pointerX = getClientX(e);
+    const dx = pointerX - startX;
+
+    if (Math.abs(dx) > 4) {
+      isDragging = true;
+    }
+
+    if (isDragging) {
+      currentTranslate = startTranslate - dx;
+      applyTransform();
+    }
+  }
+
+  function onEnd(e) {
+    if (!isPointerDown) return;
+
+    isPointerDown = false;
+    gallery.classList.remove("is-dragging");
+
+    const endX = getClientX(e);
+    const dx = endX - startX;
+    const threshold = gallery.clientWidth * 0.12;
+
+    if (!isDragging) {
+      if (isDesktop() && e.clientX !== undefined) {
+        const rect = gallery.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+
+        if (clickX > rect.width / 2) {
+          goNext();
+        } else {
+          goPrev();
+        }
+
+        updateDesktopCursor(e);
+      } else {
+        snapTo(currentIndex);
+      }
+      return;
+    }
+
+    if (dx < -threshold) {
+      goNext();
+    } else if (dx > threshold) {
+      goPrev();
+    } else {
+      snapTo(currentIndex);
+    }
+
+    isDragging = false;
+  }
 
   gallery.addEventListener("mouseenter", (e) => {
     if (!isDesktop()) return;
@@ -113,95 +183,31 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     clearDesktopCursor();
   });
 
-  gallery.addEventListener("mousemove", (e) => {
-    if (!isDesktop()) return;
+  gallery.addEventListener("mousemove", onMove);
 
-    if (isPointerDown) {
-      if (Math.abs(e.clientX - startX) > 4) {
-        hasDragged = true;
-      }
-      return;
-    }
+  gallery.addEventListener("mousedown", onStart);
+  window.addEventListener("mousemove", onMove);
+  window.addEventListener("mouseup", onEnd);
 
-    updateDesktopCursor(e);
-  });
-
-  gallery.addEventListener(
-    "touchstart",
-    (e) => {
-      startX = e.touches[0].clientX;
-      lastX = startX;
-    },
-    { passive: true }
-  );
-
-  gallery.addEventListener(
-    "touchmove",
-    (e) => {
-      lastX = e.touches[0].clientX;
-    },
-    { passive: true }
-  );
-
-  gallery.addEventListener(
-    "touchend",
-    () => {
-      const swipeDistance = lastX - startX;
-
-      if (swipeDistance < -30) {
-        goNext();
-      } else if (swipeDistance > 30) {
-        goPrev();
-      } else {
-        animateToSlide(currentIndex);
-      }
-    },
-    { passive: true }
-  );
-
-  gallery.addEventListener("mousedown", (e) => {
-    if (!isDesktop()) return;
-
-    isPointerDown = true;
-    hasDragged = false;
-    startX = e.clientX;
-    lastX = e.clientX;
-    gallery.classList.add("is-dragging");
-    clearDesktopCursor();
-  });
-
-  window.addEventListener("mouseup", (e) => {
-    if (!isPointerDown) return;
-
-    isPointerDown = false;
-    gallery.classList.remove("is-dragging");
-
-    const dx = e.clientX - startX;
-
-    if (!hasDragged) {
-      const rect = gallery.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const centerX = rect.width / 2;
-
-      if (x > centerX) {
-        goNext();
-      } else {
-        goPrev();
-      }
-    } else if (dx < -30) {
-      goNext();
-    } else if (dx > 30) {
-      goPrev();
-    } else {
-      animateToSlide(currentIndex);
-    }
-
-    if (isDesktop()) {
-      updateDesktopCursor(e);
-    }
-  });
+  gallery.addEventListener("touchstart", onStart, { passive: true });
+  gallery.addEventListener("touchmove", onMove, { passive: true });
+  gallery.addEventListener("touchend", onEnd, { passive: true });
 
   gallery.addEventListener("dragstart", (e) => {
     e.preventDefault();
   });
+
+  window.addEventListener("resize", () => {
+    snapTo(currentIndex, true);
+
+    if (!isDesktop()) {
+      clearDesktopCursor();
+    }
+  });
+
+  snapTo(0, true);
+
+  if (!animationFrame) {
+    animate();
+  }
 });
