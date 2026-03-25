@@ -65,12 +65,17 @@
     cursor: auto;
   }
 
-  .gallery::after {
-    display: none;
-  }
+.gallery {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  cursor: none;
+  touch-action: pan-y;
+  user-select: none;
+}
+
 .gallery-track {
   display: flex;
-  align-items: center;
   gap: 0;
   will-change: transform;
   transform: translate3d(0, 0, 0);
@@ -80,9 +85,6 @@
   flex: 0 0 100%;
   min-width: 100%;
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
 }
 
 .gallery .frame {
