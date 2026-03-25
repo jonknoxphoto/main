@@ -1,17 +1,20 @@
 document.querySelectorAll(".gallery").forEach((gallery) => {
+  if (gallery.dataset.carouselInit === "true") return;
+  gallery.dataset.carouselInit = "true";
+
   const track = gallery.querySelector(".gallery-track");
   if (!track) return;
 
-  // remove old clones if this script runs again
+  // remove any old clones
   track.querySelectorAll(".is-clone").forEach((el) => el.remove());
 
   const realSlides = Array.from(track.querySelectorAll(".slide"));
   const realCount = realSlides.length;
   if (realCount <= 1) return;
 
+  // build infinite loop clones
   const firstClone = realSlides[0].cloneNode(true);
   const lastClone = realSlides[realCount - 1].cloneNode(true);
-
   firstClone.classList.add("is-clone");
   lastClone.classList.add("is-clone");
 
@@ -42,6 +45,42 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     track.style.transform = `translate3d(${-currentTranslate}px, 0, 0)`;
   }
 
+  function setIndex(index, immediate = false) {
+    currentIndex = index;
+    targetTranslate = getTranslateForIndex(index);
+
+    if (immediate) {
+      currentTranslate = targetTranslate;
+      applyTransform();
+    }
+  }
+
+  function instantJumpTo(index) {
+    currentIndex = index;
+    currentTranslate = getTranslateForIndex(index);
+    targetTranslate = currentTranslate;
+    applyTransform();
+  }
+
+  function goNext() {
+    setIndex(currentIndex + 1);
+  }
+
+  function goPrev() {
+    setIndex(currentIndex - 1);
+  }
+
+  function normalizeLoopPosition() {
+    if (currentIndex === 0) {
+      instantJumpTo(realCount);
+      return;
+    }
+
+    if (currentIndex === realCount + 1) {
+      instantJumpTo(1);
+    }
+  }
+
   function updateDesktopCursor(e) {
     if (!isDesktop() || isPointerDown || e.clientX === undefined) return;
 
@@ -61,47 +100,9 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     gallery.classList.remove("show-cursor", "cursor-left", "cursor-right");
   }
 
-  function snapTo(index, immediate = false) {
-    currentIndex = index;
-    targetTranslate = getTranslateForIndex(index);
-
-    if (immediate) {
-      currentTranslate = targetTranslate;
-      applyTransform();
-    }
-  }
-
-  function instantJumpTo(index) {
-    currentIndex = index;
-    currentTranslate = getTranslateForIndex(index);
-    targetTranslate = currentTranslate;
-    applyTransform();
-  }
-
-  function goNext() {
-    snapTo(currentIndex + 1);
-  }
-
-  function goPrev() {
-    snapTo(currentIndex - 1);
-  }
-
-  function normalizeLoopPosition() {
-    // clone before first real slide
-    if (currentIndex === 0) {
-      instantJumpTo(realCount);
-      return;
-    }
-
-    // clone after last real slide
-    if (currentIndex === realCount + 1) {
-      instantJumpTo(1);
-    }
-  }
-
   function animate() {
     if (!isDragging) {
-      currentTranslate += (targetTranslate - currentTranslate) * 0.14;
+      currentTranslate += (targetTranslate - currentTranslate) * 0.16;
 
       if (Math.abs(targetTranslate - currentTranslate) < 0.5) {
         currentTranslate = targetTranslate;
@@ -126,7 +127,6 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     isDragging = false;
     startX = getClientX(e);
     startTranslate = currentTranslate;
-
     gallery.classList.add("is-dragging");
     clearDesktopCursor();
   }
@@ -171,8 +171,9 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
 
         updateDesktopCursor(e);
       } else {
-        snapTo(currentIndex);
+        setIndex(currentIndex);
       }
+
       return;
     }
 
@@ -181,7 +182,7 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     } else if (dx > threshold) {
       goPrev();
     } else {
-      snapTo(currentIndex);
+      setIndex(currentIndex);
     }
 
     isDragging = false;
