@@ -5,12 +5,14 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   const track = gallery.querySelector(".gallery-track");
   if (!track) return;
 
+  // remove old clones
   track.querySelectorAll(".is-clone").forEach((el) => el.remove());
 
   const realSlides = Array.from(track.querySelectorAll(".slide"));
   const realCount = realSlides.length;
   if (realCount <= 1) return;
 
+  // create clones
   const firstClone = realSlides[0].cloneNode(true);
   const lastClone = realSlides[realCount - 1].cloneNode(true);
   firstClone.classList.add("is-clone");
@@ -41,35 +43,19 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     return window.innerWidth > 480;
   }
 
-  function getOffsetWithin(element, ancestor) {
-    let x = 0;
-    let el = element;
-
-    while (el && el !== ancestor) {
-      x += el.offsetLeft;
-      el = el.offsetParent;
-    }
-
-    return x;
+  function refreshSlides() {
+    slides = Array.from(track.querySelectorAll(".slide"));
   }
 
-function getTranslateForIndex(index) {
-  const slide = slides[index];
-  if (!slide) return 0;
+  function getTranslateForIndex(index) {
+    const slide = slides[index];
+    if (!slide) return 0;
 
-  const img = slide.querySelector(".frame img");
-  const frame = slide.querySelector(".frame");
-  const target = img || frame || slide;
+    const slideCenter = slide.offsetLeft + slide.offsetWidth / 2;
+    const galleryCenter = gallery.clientWidth / 2;
 
-  const targetCenter = target.offsetLeft + target.offsetWidth / 2;
-  const slideCenter = slide.offsetLeft + slide.offsetWidth / 2;
-  const innerOffset = targetCenter - slideCenter;
-
-  const slideVisualCenter = slide.offsetLeft + slide.offsetWidth / 2 + innerOffset;
-  const galleryCenter = gallery.clientWidth / 2;
-
-  return slideVisualCenter - galleryCenter;
-}
+    return slideCenter - galleryCenter;
+  }
 
   function applyTransform() {
     track.style.transform = `translate3d(${-currentTranslate}px, 0, 0)`;
@@ -270,6 +256,15 @@ function getTranslateForIndex(index) {
     velocityX = 0;
   }
 
+  function forceLayoutAndCenter(index = currentIndex) {
+    refreshSlides();
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        instantJumpTo(index);
+      });
+    });
+  }
+
   gallery.addEventListener("mouseenter", updateDesktopCursor);
   gallery.addEventListener("mousemove", updateDesktopCursor);
   gallery.addEventListener("mouseleave", clearDesktopCursor);
@@ -283,19 +278,50 @@ function getTranslateForIndex(index) {
   window.addEventListener("touchend", onEnd, { passive: true });
   window.addEventListener("touchcancel", onEnd, { passive: true });
 
-  gallery.addEventListener("dragstart", (e) => e.preventDefault());
+  gallery.addEventListener("dragstart", (e) => {
+    e.preventDefault();
+  });
 
   window.addEventListener("resize", () => {
-    slides = Array.from(track.querySelectorAll(".slide"));
-    instantJumpTo(currentIndex);
+    forceLayoutAndCenter(currentIndex);
     if (!isDesktop()) clearDesktopCursor();
   });
 
-  window.addEventListener("load", () => {
-    slides = Array.from(track.querySelectorAll(".slide"));
-    instantJumpTo(currentIndex);
-  });
+  // re-center after all images in this gallery have loaded
+  const imgs = gallery.querySelectorAll("img");
+  let remaining = imgs.length;
 
-  instantJumpTo(1);
+  if (remaining === 0) {
+    forceLayoutAndCenter(1);
+  } else {
+    imgs.forEach((img) => {
+      if (img.complete) {
+        remaining -= 1;
+      } else {
+        img.addEventListener(
+          "load",
+          () => {
+            remaining -= 1;
+            if (remaining <= 0) forceLayoutAndCenter(1);
+          },
+          { once: true }
+        );
+
+        img.addEventListener(
+          "error",
+          () => {
+            remaining -= 1;
+            if (remaining <= 0) forceLayoutAndCenter(1);
+          },
+          { once: true }
+        );
+      }
+    });
+
+    if (remaining <= 0) {
+      forceLayoutAndCenter(1);
+    }
+  }
+
   animate();
 });
