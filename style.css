@@ -6,6 +6,8 @@
   cursor: none;
   touch-action: pan-y;
   user-select: none;
+  display: flex;
+  align-items: center;
 }
 
 .gallery-track {
@@ -13,6 +15,7 @@
   gap: 0;
   will-change: transform;
   transform: translate3d(0, 0, 0);
+  align-items: center;
 }
 
 .gallery .slide {
@@ -23,6 +26,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
 }
 
 .gallery .frame {
