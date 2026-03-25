@@ -159,7 +159,7 @@ h1.title {
   .archive-grid img {
     display: block;
     width: auto;
-    height: min(48svh, 48dvh, 48vh);
+    height: min(44svh, 44dvh, 44vh);
     max-width: 100%;
     max-height: min(48svh, 48dvh, 48vh);
     object-fit: contain;
