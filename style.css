@@ -20,147 +20,79 @@ h1.title {
   gap: 26px;
 }
 
-/* GALLERY WRAPPER */
+/* GALLERY */
 .gallery {
   width: 100%;
-  max-width: 100%;
   overflow: hidden;
   position: relative;
   cursor: none;
   touch-action: pan-y;
-  user-select: none;
-}
-
-/* CURSOR */
-.gallery::after {
-  content: "";
-  position: absolute;
-  left: var(--cursor-x, 50%);
-  top: var(--cursor-y, 50%);
-  width: 28px;
-  height: 28px;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-  z-index: 20;
-  opacity: 0;
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: contain;
-}
-
-.gallery.show-cursor::after {
-  opacity: 1;
-}
-
-.gallery.cursor-left::after {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M15 5l-7 7 7 7' stroke='black' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
-}
-
-.gallery.cursor-right::after {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M9 5l7 7-7 7' stroke='black' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
-}
-
-.gallery.is-dragging::after {
-  opacity: 0;
 }
 
 /* TRACK */
 .gallery-track {
   display: flex;
-  align-items: flex-start;
-  will-change: transform;
-  transform: translateX(0);
 }
 
-/* SLIDE = real layout container */
+/* SLIDE (desktop layout: image + caption side by side) */
 .gallery .slide {
   flex: 0 0 100%;
   min-width: 100%;
-  width: 100%;
   display: flex;
-  flex-direction: row;
   justify-content: center;
   align-items: center;
-  gap: 10px; /* desktop space between image and caption */
+  gap: 10px;
 }
 
-/* FRAME = image wrapper only */
+/* IMAGE WRAPPER */
 .gallery .frame {
-  flex: 0 1 auto;
-  width: auto;
-  max-width: calc(100% - 150px);
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 0;
 }
 
-/* DESKTOP IMAGE (+20%) */
+/* ✅ DESKTOP IMAGE — NOW WIDTH DRIVEN (FEELS MUCH BIGGER) */
 .gallery .frame img {
   display: block;
-  width: auto;
-  height: 84vh;
-  max-width: 100%;
-  max-height: 84vh;
+  width: 75vw;              /* <-- KEY CHANGE */
+  max-width: 1200px;
+  height: auto;
+  max-height: 88vh;
   object-fit: contain;
-  margin: 0;
 }
 
-/* DESKTOP CAPTION */
+/* CAPTION RIGHT */
 .gallery .caption {
-  flex: 0 0 140px;
   width: 140px;
   min-width: 140px;
   display: flex;
   flex-direction: column;
   gap: 2px;
-  text-align: left;
-  align-items: flex-start;
-  color: #111;
-  pointer-events: none;
 }
 
 /* ================= MOBILE ================= */
 @media (max-width: 480px) {
+
   .page {
-    width: 100%;
-    max-width: 100%;
     padding-left: 12px;
     padding-right: 12px;
     overflow-x: hidden;
   }
 
-  .archive-grid {
-    display: block;
-    width: 100%;
-    max-width: 100%;
-  }
-
   .gallery {
-    width: 100%;
-    max-width: 100%;
-    overflow: hidden;
     cursor: auto;
   }
 
-  .gallery::after {
-    display: none;
-  }
-
   .gallery-track {
-    align-items: flex-start;
+    display: flex;
   }
 
-  /* mobile slide with built-in 20px gallery spacing */
+  /* ✅ GAP THAT ACTUALLY WORKS */
   .gallery .slide {
     flex: 0 0 100%;
     min-width: 100%;
-    width: 100%;
-    display: flex;
     flex-direction: column;
-    justify-content: flex-start;
     align-items: center;
-    gap: 0;
     padding-right: 20px;
   }
 
@@ -170,32 +102,25 @@ h1.title {
 
   .gallery .frame {
     width: 100%;
-    max-width: 100%;
-    min-height: 0;
     display: flex;
     justify-content: center;
     align-items: center;
   }
 
-  /* centered, fully visible mobile image */
+  /* ✅ HARD MOBILE FIX — WILL FIT SCREEN */
   .gallery .frame img,
   .archive-grid img {
     display: block;
     width: auto;
     height: auto;
     max-width: 100%;
-    max-height: 46svh;
+    max-height: 42vh;   /* 🔥 THIS FIXES YOUR ISSUE */
     object-fit: contain;
-    margin-left: auto;
-    margin-right: auto;
+    margin: 0 auto;
   }
 
   .gallery .caption {
-    flex: 0 0 auto;
     width: 100%;
-    min-width: 0;
     margin-top: 8px;
-    text-align: left;
-    align-items: flex-start;
   }
 }
