@@ -12,7 +12,6 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   let isDragging = false;
   let startX = 0;
   let startTranslate = 0;
-  let pointerX = 0;
 
   function isDesktop() {
     return window.innerWidth > 480;
@@ -107,7 +106,6 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     isPointerDown = true;
     isDragging = false;
     startX = getClientX(e);
-    pointerX = startX;
     startTranslate = targetTranslate;
 
     gallery.classList.add("is-dragging");
@@ -120,8 +118,7 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
       return;
     }
 
-    pointerX = getClientX(e);
-    const dx = pointerX - startX;
+    const dx = getClientX(e) - startX;
 
     if (Math.abs(dx) > 4) {
       isDragging = true;
@@ -139,8 +136,7 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     isPointerDown = false;
     gallery.classList.remove("is-dragging");
 
-    const endX = getClientX(e);
-    const dx = endX - startX;
+    const dx = getClientX(e) - startX;
     const threshold = gallery.clientWidth * 0.12;
 
     if (!isDragging) {
@@ -159,7 +155,6 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
         snapTo(currentIndex);
       }
 
-      isDragging = false;
       return;
     }
 
@@ -174,16 +169,9 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     isDragging = false;
   }
 
-  gallery.addEventListener("mouseenter", (e) => {
-    if (!isDesktop()) return;
-    updateDesktopCursor(e);
-  });
-
-  gallery.addEventListener("mouseleave", () => {
-    clearDesktopCursor();
-  });
-
-  gallery.addEventListener("mousemove", onMove);
+  gallery.addEventListener("mouseenter", updateDesktopCursor);
+  gallery.addEventListener("mousemove", updateDesktopCursor);
+  gallery.addEventListener("mouseleave", clearDesktopCursor);
 
   gallery.addEventListener("mousedown", onStart);
   window.addEventListener("mousemove", onMove);
