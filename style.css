@@ -111,32 +111,31 @@ h1.title {
     display: none;
   }
 
-  .gallery-track {
-    width: 100%;
-    align-items: stretch;
-    gap: 20px;
-  }
+.gallery-track {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  will-change: transform;
+}
 
-  .gallery .slide {
-    flex: 0 0 calc(100% - 20px);
-    min-width: calc(100% - 20px);
-    width: calc(100% - 20px);
-    max-width: calc(100% - 20px);
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-  }
+.gallery .slide {
+  flex: 0 0 100%;
+  min-width: 100%;
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
-  .gallery .frame {
-    width: 100%;
-    height: 40dvh;
-    max-height: 40dvh;
-    flex: 0 0 40dvh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-  }
+.gallery .frame {
+  width: 100%;
+  padding: 0 10px; /* visible 20px total gutter */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
 
   .gallery .frame img {
     display: block;
