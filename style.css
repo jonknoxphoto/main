@@ -108,14 +108,14 @@ h1.title {
 
   .gallery .slide,
   .gallery .item {
-    flex: 0 0 100%;
-    min-width: 100%;
-    width: 100%;
-    max-width: 100%;
+    flex: 0 0 auto;
+    min-width: auto;
+    width: auto;
+    max-width: auto;
   }
 
   .gallery .frame {
-    width: 90%;
+    width: 50%;
     height: 58dvh;
     max-height: 58dvh;
     display: flex;
@@ -126,10 +126,10 @@ h1.title {
 
   .gallery .frame img {
     display: block;
-    width: auto%;
-    height: auto%;
-    max-width: 100%;
-    max-height: 100%;
+    width: auto;
+    height: auto;
+    max-width: auto;
+    max-height: auto;
     object-fit: contain;
     margin: 0 auto;
   }
