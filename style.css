@@ -161,12 +161,12 @@ h1.title {
     width: 100%;
   }
 
-  .gallery .frame img {
-    width: auto;
-    height: auto;
-    max-width: 100%;
-    max-height: 84vh;
-  }
+.gallery .frame {
+  width: 100%;
+  display: flex;
+  justify-content: center;   /* center X */
+  align-items: center;       /* center Y */
+}
 
   .gallery .caption {
     width: 100%;
