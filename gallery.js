@@ -41,15 +41,34 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     return window.innerWidth > 480;
   }
 
+  function getOffsetWithin(element, ancestor) {
+    let x = 0;
+    let el = element;
+
+    while (el && el !== ancestor) {
+      x += el.offsetLeft;
+      el = el.offsetParent;
+    }
+
+    return x;
+  }
+
   function getTranslateForIndex(index) {
     const slide = slides[index];
     if (!slide) return 0;
 
-    const slideRectLeft = slide.offsetLeft;
-    const slideWidth = slide.offsetWidth;
-    const galleryWidth = gallery.clientWidth;
+    const frame = slide.querySelector(".frame");
+    const img = slide.querySelector("img");
 
-    return slideRectLeft - (galleryWidth - slideWidth) / 2;
+    const target = img || frame || slide;
+
+    const targetLeft = getOffsetWithin(target, track);
+    const targetWidth = target.offsetWidth;
+    const targetCenter = targetLeft + targetWidth / 2;
+
+    const galleryCenter = gallery.clientWidth / 2;
+
+    return targetCenter - galleryCenter;
   }
 
   function applyTransform() {
@@ -264,14 +283,17 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   window.addEventListener("touchend", onEnd, { passive: true });
   window.addEventListener("touchcancel", onEnd, { passive: true });
 
-  gallery.addEventListener("dragstart", (e) => {
-    e.preventDefault();
-  });
+  gallery.addEventListener("dragstart", (e) => e.preventDefault());
 
   window.addEventListener("resize", () => {
     slides = Array.from(track.querySelectorAll(".slide"));
     instantJumpTo(currentIndex);
     if (!isDesktop()) clearDesktopCursor();
+  });
+
+  window.addEventListener("load", () => {
+    slides = Array.from(track.querySelectorAll(".slide"));
+    instantJumpTo(currentIndex);
   });
 
   instantJumpTo(1);
