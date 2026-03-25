@@ -14,6 +14,7 @@ h1.title {
   line-height: 0.95;
   color: #111;
 }
+
 .site-header {
   position: relative;
   width: 100%;
@@ -47,7 +48,7 @@ h1.title {
   color: #111;
 }
 
-/* CENTER NAME (this is the magic) */
+/* CENTER NAME */
 .header-center {
   position: absolute;
   left: 50%;
@@ -74,7 +75,7 @@ h1.title {
 
 .gallery-track {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 0;
   will-change: transform;
   transform: translate3d(0, 0, 0);
@@ -87,6 +88,7 @@ h1.title {
   max-width: 100%;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   align-items: center;
 }
 
@@ -107,6 +109,7 @@ h1.title {
   height: auto;
   object-fit: contain;
 }
+
 .gallery .caption {
   position: static;
   transform: none;
@@ -147,6 +150,7 @@ h1.title {
   }
 
   .gallery-track {
+    align-items: center;
     gap: 0;
   }
 
@@ -155,6 +159,7 @@ h1.title {
     min-width: 100%;
     width: 100%;
     max-width: 100%;
+    justify-content: center;
   }
 
   .gallery .frame {
