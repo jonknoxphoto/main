@@ -154,7 +154,7 @@ h1.title {
   }
 
   .gallery-track {
-    gap: 0;
+    gap: 20;
   }
 
   .gallery .item {
