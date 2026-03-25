@@ -1,8 +1,9 @@
 document.querySelectorAll(".gallery").forEach((gallery) => {
   const track = gallery.querySelector(".gallery-track");
-  let realSlides = Array.from(track.querySelectorAll(".slide"));
+  if (!track) return;
 
-  if (!track || realSlides.length <= 1) return;
+  let realSlides = Array.from(track.querySelectorAll(".slide"));
+  if (realSlides.length <= 1) return;
 
   const firstClone = realSlides[0].cloneNode(true);
   const lastClone = realSlides[realSlides.length - 1].cloneNode(true);
@@ -28,20 +29,16 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     return window.innerWidth > 480;
   }
 
-function getGap() {
-  return 0;
-}
+  function getGap() {
+    return 0;
+  }
 
-function getSlideWidth() {
-  return gallery.clientWidth;
-}
-
-  const slideWidth = slide.getBoundingClientRect().width;
-  return slideWidth + getGap();
-}
+  function getSlideWidth() {
+    return gallery.clientWidth;
+  }
 
   function getTranslateForIndex(index) {
-    return index * getSlideWidth();
+    return index * (getSlideWidth() + getGap());
   }
 
   function applyTransform() {
