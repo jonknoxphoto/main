@@ -41,14 +41,15 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     return window.innerWidth > 480;
   }
 
-function getTranslateForIndex(index) {
-  const slide = slides[index];
-  if (!slide) return 0;
+  function getTranslateForIndex(index) {
+    const slide = slides[index];
+    if (!slide) return 0;
 
-  const slideCenter = slide.offsetLeft + slide.offsetWidth / 2;
-  const galleryCenter = gallery.clientWidth / 2;
+    const slideRectLeft = slide.offsetLeft;
+    const slideWidth = slide.offsetWidth;
+    const galleryWidth = gallery.clientWidth;
 
-  return slideCenter - galleryCenter;
+    return slideRectLeft - (galleryWidth - slideWidth) / 2;
   }
 
   function applyTransform() {
@@ -216,7 +217,6 @@ function getTranslateForIndex(index) {
     }
 
     const dx = getClientX(e) - startX;
-    const absDx = Math.abs(dx);
     const threshold = gallery.clientWidth * (isDesktop() ? 0.12 : 0.1);
     const flickVelocity = 0.45;
 
