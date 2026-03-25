@@ -1,10 +1,19 @@
 document.querySelectorAll(".gallery").forEach((gallery) => {
   const track = gallery.querySelector(".gallery-track");
-  const slides = Array.from(track.querySelectorAll(".slide"));
+  let slides = Array.from(track.querySelectorAll(".slide"));
 
   if (!track || slides.length <= 1) return;
 
-  let currentIndex = 0;
+  // 🔁 CLONE FIRST + LAST
+  const firstClone = slides[0].cloneNode(true);
+  const lastClone = slides[slides.length - 1].cloneNode(true);
+
+  track.appendChild(firstClone);
+  track.insertBefore(lastClone, slides[0]);
+
+  slides = Array.from(track.querySelectorAll(".slide"));
+
+  let currentIndex = 1; // start on real first slide
   let currentTranslate = 0;
   let targetTranslate = 0;
 
@@ -30,65 +39,49 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     return gallery.clientWidth + getGap();
   }
 
-  function getTranslateForIndex(index) {
-    return clamp(index, 0, slides.length - 1) * getSlideWidth();
+  function getTranslate(index) {
+    return index * getSlideWidth();
   }
 
   function applyTransform() {
-    track.style.transform = `translate3d(${-currentTranslate}px, 0, 0)`;
+    track.style.transform = `translate3d(${-currentTranslate}px,0,0)`;
   }
 
-  function updateDesktopCursor(e) {
-    if (!isDesktop() || isPointerDown || e.clientX === undefined) return;
-
-    const rect = gallery.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const centerX = rect.width / 2;
-
-    gallery.style.setProperty("--cursor-x", `${x}px`);
-    gallery.style.setProperty("--cursor-y", `${y}px`);
-    gallery.classList.add("show-cursor");
-    gallery.classList.toggle("cursor-left", x < centerX);
-    gallery.classList.toggle("cursor-right", x >= centerX);
+  function snap(index) {
+    currentIndex = index;
+    targetTranslate = getTranslate(currentIndex);
   }
 
-  function clearDesktopCursor() {
-    gallery.classList.remove("show-cursor", "cursor-left", "cursor-right");
-  }
-
-  function snapTo(index, immediate = false) {
-    currentIndex = clamp(index, 0, slides.length - 1);
-    targetTranslate = getTranslateForIndex(currentIndex);
-
-    if (immediate) {
-      currentTranslate = targetTranslate;
-      applyTransform();
-    }
+  function instantJump(index) {
+    currentIndex = index;
+    currentTranslate = getTranslate(currentIndex);
+    targetTranslate = currentTranslate;
+    applyTransform();
   }
 
   function goNext() {
-    if (currentIndex >= slides.length - 1) {
-      snapTo(0);
-    } else {
-      snapTo(currentIndex + 1);
-    }
+    snap(currentIndex + 1);
   }
 
   function goPrev() {
-    if (currentIndex <= 0) {
-      snapTo(slides.length - 1);
-    } else {
-      snapTo(currentIndex - 1);
-    }
+    snap(currentIndex - 1);
   }
 
   function animate() {
     if (!isDragging) {
       currentTranslate += (targetTranslate - currentTranslate) * 0.14;
 
-      if (Math.abs(targetTranslate - currentTranslate) < 0.25) {
+      if (Math.abs(targetTranslate - currentTranslate) < 0.3) {
         currentTranslate = targetTranslate;
+
+        // 🔁 LOOP FIX
+        if (currentIndex === slides.length - 1) {
+          instantJump(1);
+        }
+
+        if (currentIndex === 0) {
+          instantJump(slides.length - 2);
+        }
       }
 
       applyTransform();
@@ -98,8 +91,7 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   }
 
   function getClientX(e) {
-    if (e.touches && e.touches.length) return e.touches[0].clientX;
-    if (e.changedTouches && e.changedTouches.length) return e.changedTouches[0].clientX;
+    if (e.touches) return e.touches[0].clientX;
     return e.clientX;
   }
 
@@ -111,21 +103,15 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     startTranslate = targetTranslate;
 
     gallery.classList.add("is-dragging");
-    clearDesktopCursor();
   }
 
   function onMove(e) {
-    if (!isPointerDown) {
-      updateDesktopCursor(e);
-      return;
-    }
+    if (!isPointerDown) return;
 
     pointerX = getClientX(e);
     const dx = pointerX - startX;
 
-    if (Math.abs(dx) > 4) {
-      isDragging = true;
-    }
+    if (Math.abs(dx) > 4) isDragging = true;
 
     if (isDragging) {
       currentTranslate = startTranslate - dx;
@@ -139,52 +125,17 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     isPointerDown = false;
     gallery.classList.remove("is-dragging");
 
-    const endX = getClientX(e);
-    const dx = endX - startX;
+    const dx = getClientX(e) - startX;
     const threshold = gallery.clientWidth * 0.12;
 
-    if (!isDragging) {
-      if (isDesktop() && e.clientX !== undefined) {
-        const rect = gallery.getBoundingClientRect();
-        const clickX = e.clientX - rect.left;
-
-        if (clickX > rect.width / 2) {
-          goNext();
-        } else {
-          goPrev();
-        }
-
-        updateDesktopCursor(e);
-      } else {
-        snapTo(currentIndex);
-      }
-
-      isDragging = false;
-      return;
-    }
-
-    if (dx < -threshold) {
-      goNext();
-    } else if (dx > threshold) {
-      goPrev();
-    } else {
-      snapTo(currentIndex);
-    }
+    if (dx < -threshold) goNext();
+    else if (dx > threshold) goPrev();
+    else snap(currentIndex);
 
     isDragging = false;
   }
 
-  gallery.addEventListener("mouseenter", (e) => {
-    if (!isDesktop()) return;
-    updateDesktopCursor(e);
-  });
-
-  gallery.addEventListener("mouseleave", () => {
-    clearDesktopCursor();
-  });
-
-  gallery.addEventListener("mousemove", onMove);
-
+  // EVENTS
   gallery.addEventListener("mousedown", onStart);
   window.addEventListener("mousemove", onMove);
   window.addEventListener("mouseup", onEnd);
@@ -193,15 +144,13 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   gallery.addEventListener("touchmove", onMove, { passive: true });
   gallery.addEventListener("touchend", onEnd, { passive: true });
 
-  gallery.addEventListener("dragstart", (e) => {
-    e.preventDefault();
-  });
+  gallery.addEventListener("dragstart", (e) => e.preventDefault());
 
   window.addEventListener("resize", () => {
-    snapTo(currentIndex, true);
-    if (!isDesktop()) clearDesktopCursor();
+    instantJump(currentIndex);
   });
 
-  snapTo(0, true);
+  // INIT
+  instantJump(1);
   animate();
 });
