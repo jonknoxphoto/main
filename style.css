@@ -33,17 +33,17 @@ h1.title {
 .gallery-track {
   display: flex;
   align-items: flex-start;
-  gap: 20px;
+  gap: 0;
   will-change: transform;
   transform: translate3d(0, 0, 0);
 }
 
 /* SLIDE */
 .gallery .slide {
-  flex: 0 0 calc(100% - 40px);
-  min-width: calc(100% - 40px);
-  width: calc(100% - 40px);
-  max-width: calc(100% - 40px);
+  flex: 0 0 100%;
+  min-width: 100%;
+  width: 100%;
+  max-width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -51,7 +51,7 @@ h1.title {
 
 /* FRAME */
 .gallery .frame {
-  width: calc(100% - 20px); /* this is what creates visible breathing room */
+  width: calc(100% - 20px); /* visible 20px separation */
   margin: 0 auto;
   display: flex;
   justify-content: center;
@@ -64,7 +64,7 @@ h1.title {
   display: block;
   width: auto;
   height: 70vh;
-  max-width: 200%;
+  max-width: 100%;
   max-height: 70vh;
   object-fit: contain;
   margin: 0 auto;
@@ -116,21 +116,21 @@ h1.title {
   .gallery-track {
     width: 100%;
     align-items: stretch;
-    gap: 20px;
+    gap: 0;
   }
 
   .gallery .slide {
-    flex: 0 0 calc(100% - 40px);
-    min-width: calc(100% - 40px);
-    width: calc(100% - 40px);
-    max-width: calc(100% - 40px);
+    flex: 0 0 100%;
+    min-width: 100%;
+    width: 100%;
+    max-width: 100%;
     display: flex;
     flex-direction: column;
     align-items: stretch;
   }
 
   .gallery .frame {
-    width: calc(100% - 20px); /* visible gap */
+    width: calc(100% - 20px); /* visible 20px separation */
     margin: 0 auto;
     height: 40dvh;
     max-height: 40dvh;
