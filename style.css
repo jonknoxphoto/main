@@ -68,17 +68,17 @@ h1.title {
 .gallery-track {
   display: flex;
   align-items: flex-start;
-  gap: 20px;
+  gap: 24px; /* space between slides */
   will-change: transform;
   transform: translateX(0);
 }
 
 /* EACH SLIDE */
 .gallery .slide {
-  flex: 0 0 100%;
-  min-width: 100%;
-  width: 100%;
-  max-width: 100%;
+  flex: 0 0 calc(100% - 24px); /* keeps a gap visible */
+  min-width: calc(100% - 24px);
+  width: calc(100% - 24px);
+  max-width: calc(100% - 24px);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -128,8 +128,8 @@ h1.title {
 /* MOBILE */
 @media (max-width: 480px) {
   .page {
-    padding-left: 20px;
-    padding-right: 20px;
+    padding-left: 16px;
+    padding-right: 16px;
     width: 100%;
     max-width: 100%;
     overflow-x: hidden;
@@ -154,14 +154,15 @@ h1.title {
   }
 
   .gallery-track {
-    gap: 17px;
+    gap: 16px; /* space between mobile slides */
   }
 
   .gallery .slide {
-    flex: 0 0 100%;
-    min-width: 100%;
-    width: 100%;
-    padding: 20px;
+    flex: 0 0 calc(100% - 16px);
+    min-width: calc(100% - 16px);
+    width: calc(100% - 16px);
+    max-width: calc(100% - 16px);
+    padding: 0;
   }
 
   .gallery .frame {
@@ -176,7 +177,7 @@ h1.title {
     width: auto;
     height: auto;
     max-width: 100%;
-    max-height: 75vh;
+    max-height: 68vh; /* fits more reliably on mobile screens */
     margin: 0 auto;
     object-fit: contain;
   }
