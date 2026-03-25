@@ -1,6 +1,12 @@
 document.querySelectorAll(".gallery").forEach((gallery) => {
+  if (gallery.dataset.carouselInit === "true") return;
+  gallery.dataset.carouselInit = "true";
+
   const track = gallery.querySelector(".gallery-track");
   if (!track) return;
+
+  // remove any old clones first
+  track.querySelectorAll(".is-clone").forEach((clone) => clone.remove());
 
   const originalSlides = Array.from(track.querySelectorAll(".slide"));
   const realCount = originalSlides.length;
@@ -18,7 +24,7 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
 
   const slides = Array.from(track.querySelectorAll(".slide"));
 
-  let currentIndex = 1; // first real slide
+  let currentIndex = 1;
   let currentTranslate = 0;
   let targetTranslate = 0;
 
@@ -77,31 +83,19 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   }
 
   function goNext() {
-    if (currentIndex >= realCount) {
-      // go to the first clone, then jump to real first
-      snapTo(realCount + 1);
-    } else {
-      snapTo(currentIndex + 1);
-    }
+    snapTo(currentIndex + 1);
   }
 
   function goPrev() {
-    if (currentIndex <= 1) {
-      // go to the last clone, then jump to real last
-      snapTo(0);
-    } else {
-      snapTo(currentIndex - 1);
-    }
+    snapTo(currentIndex - 1);
   }
 
   function normalizeLoopPosition() {
-    // landed on clone before first real slide
     if (currentIndex === 0) {
       instantJumpTo(realCount);
       return;
     }
 
-    // landed on clone after last real slide
     if (currentIndex === realCount + 1) {
       instantJumpTo(1);
     }
@@ -181,6 +175,7 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
       } else {
         snapTo(currentIndex);
       }
+
       return;
     }
 
