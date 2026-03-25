@@ -28,18 +28,18 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     return window.innerWidth > 480;
   }
 
-  function getGap() {
-    const styles = getComputedStyle(track);
-    return parseFloat(styles.columnGap || styles.gap || "0");
-  }
+function getGap() {
+  const styles = getComputedStyle(track);
+  return parseFloat(styles.columnGap || styles.gap || "0");
+}
 
-  function getSlideWidth() {
-    const slide = slides[currentIndex] || slides[1] || slides[0];
-    if (!slide) return gallery.clientWidth;
+function getSlideWidth() {
+  const slide = slides[currentIndex] || slides[1] || slides[0];
+  if (!slide) return gallery.clientWidth;
 
-    const slideWidth = slide.getBoundingClientRect().width;
-    return slideWidth + getGap();
-  }
+  const slideWidth = slide.getBoundingClientRect().width;
+  return slideWidth + getGap();
+}
 
   function getTranslateForIndex(index) {
     return index * getSlideWidth();
