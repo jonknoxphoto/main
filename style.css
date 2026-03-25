@@ -82,11 +82,4 @@
     font-size: 9px;
     margin-top: 8px;
   }
-  .gallery .frame {
-  background: red !important;
-}
-
-.gallery .frame img {
-  background: blue !important;
-}
 }
