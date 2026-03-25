@@ -80,6 +80,7 @@
     align-items: center !important;   /* center slides relative to each other */
     gap: 12px !important;
     width: 100% !important;
+    
   }
 
   .gallery .slide {
@@ -125,5 +126,33 @@
     align-items: flex-start !important;
     font-size: 9px !important;
     pointer-events: none !important;
+
+    @media (max-width: 480px) {
+  .gallery-track {
+    align-items: center !important;
+  }
+
+  .gallery .slide {
+    justify-content: center !important;
+    align-items: center !important;
+  }
+
+  .gallery .frame {
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+
+  .gallery .frame img {
+    max-width: 100% !important;
+    max-height: 100% !important;
+    width: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+    object-fit: contain !important;
+    object-position: center center !important;
+    align-self: center !important;
+  }
+}
   }
 }
