@@ -38,7 +38,6 @@ h1.title {
   transform: translate3d(0, 0, 0);
 }
 
-/* SLIDE */
 .gallery .slide {
   flex: 0 0 100%;
   min-width: 100%;
@@ -49,7 +48,6 @@ h1.title {
   align-items: center;
 }
 
-/* FRAME */
 .gallery .frame {
   width: 100%;
   display: flex;
@@ -58,7 +56,6 @@ h1.title {
   overflow: hidden;
 }
 
-/* DESKTOP IMAGE */
 .gallery .frame img {
   display: block;
   width: auto;
@@ -70,7 +67,6 @@ h1.title {
   pointer-events: none;
 }
 
-/* CAPTION */
 .gallery .caption {
   position: static;
   transform: none;
@@ -97,7 +93,6 @@ h1.title {
   color: #111;
 }
 
-/* MOBILE */
 @media (max-width: 480px) {
   .page {
     padding: 18px 14px 42px;
@@ -124,7 +119,6 @@ h1.title {
 
   .gallery .frame {
     width: 100%;
-    margin: 0;
   }
 
   .gallery .frame img {
