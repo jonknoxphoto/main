@@ -161,6 +161,7 @@ h1.title {
     flex: 0 0 100%;
     min-width: 100%;
     width: 100%;
+    padding: 20px;
   }
 
   .gallery .frame {
