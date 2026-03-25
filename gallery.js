@@ -7,7 +7,6 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
 
   const realSlides = Array.from(track.querySelectorAll(".slide"));
   const realCount = realSlides.length;
-
   if (realCount <= 1) return;
 
   const firstClone = realSlides[0].cloneNode(true);
@@ -21,7 +20,7 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
 
   const slides = Array.from(track.querySelectorAll(".slide"));
 
-  let currentIndex = 1;
+  let currentIndex = 1; // first real slide
   let currentTranslate = 0;
   let targetTranslate = 0;
 
@@ -91,20 +90,27 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   }
 
   function normalizeLoopPosition() {
+    // if we landed on the fake last-clone-before-first
     if (currentIndex === 0) {
       instantJumpTo(realCount);
-    } else if (currentIndex === realCount + 1) {
+      return;
+    }
+
+    // if we landed on the fake first-clone-after-last
+    if (currentIndex === realCount + 1) {
       instantJumpTo(1);
     }
   }
 
   function animate() {
     if (!isDragging) {
-      currentTranslate += (targetTranslate - currentTranslate) * 0.14;
+      currentTranslate += (targetTranslate - currentTranslate) * 0.18;
 
       if (Math.abs(targetTranslate - currentTranslate) < 0.5) {
         currentTranslate = targetTranslate;
         applyTransform();
+
+        // IMPORTANT: normalize only after the snap fully finishes
         normalizeLoopPosition();
       } else {
         applyTransform();
