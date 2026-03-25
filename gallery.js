@@ -29,13 +29,17 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   }
 
   function getGap() {
-    return parseFloat(getComputedStyle(track).gap || "0");
+    const styles = getComputedStyle(track);
+    return parseFloat(styles.columnGap || styles.gap || "0");
   }
 
-function getSlideWidth() {
-  const slide = slides[currentIndex] || slides[0];
-  return slide.getBoundingClientRect().width + getGap();
-}
+  function getSlideWidth() {
+    const slide = slides[currentIndex] || slides[1] || slides[0];
+    if (!slide) return gallery.clientWidth;
+
+    const slideWidth = slide.getBoundingClientRect().width;
+    return slideWidth + getGap();
+  }
 
   function getTranslateForIndex(index) {
     return index * getSlideWidth();
@@ -197,8 +201,8 @@ function getSlideWidth() {
   window.addEventListener("mouseup", onEnd);
 
   gallery.addEventListener("touchstart", onStart, { passive: true });
-  gallery.addEventListener("touchmove", onMove, { passive: true });
-  gallery.addEventListener("touchend", onEnd, { passive: true });
+  window.addEventListener("touchmove", onMove, { passive: true });
+  window.addEventListener("touchend", onEnd, { passive: true });
 
   gallery.addEventListener("dragstart", (e) => {
     e.preventDefault();
