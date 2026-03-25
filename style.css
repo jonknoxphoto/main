@@ -10,7 +10,6 @@
 
 .gallery-track {
   display: flex;
-  align-items: stretch;
   gap: 0;
   will-change: transform;
   transform: translate3d(0, 0, 0);
@@ -24,30 +23,26 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
 }
 
 .gallery .frame {
   width: 100%;
   height: 70vh;
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   overflow: hidden;
-  position: relative;
 }
 
 .gallery .frame img {
   display: block;
-  max-width: 100%;
-  max-height: 100%;
   width: auto;
   height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  margin: 0 auto;
   object-fit: contain;
   object-position: center center;
-  margin: auto;
-  align-self: center;
-  justify-self: center;
 }
 
 .gallery .caption {
@@ -65,47 +60,23 @@
     cursor: auto;
   }
 
-.gallery {
-  width: 100%;
-  overflow: hidden;
-  position: relative;
-  cursor: none;
-  touch-action: pan-y;
-  user-select: none;
-}
+  .gallery::after {
+    display: none;
+  }
 
-.gallery-track {
-  display: flex;
-  gap: 0;
-  will-change: transform;
-  transform: translate3d(0, 0, 0);
-}
+  .gallery .frame {
+    height: 60vh;
+  }
 
-.gallery .slide {
-  flex: 0 0 100%;
-  min-width: 100%;
-  width: 100%;
-}
-
-.gallery .frame {
-  width: 100%;
-  height: 70vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
-  position: relative;
-}
-
-.gallery .frame img {
-  display: block;
-  width: auto;
-  height: auto;
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-  margin: 0 auto;
-}
+  .gallery .frame img {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    margin: 0 auto;
+    object-fit: contain;
+    object-position: center center;
+  }
 
   .gallery .caption {
     font-size: 9px;
