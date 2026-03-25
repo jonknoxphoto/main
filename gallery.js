@@ -1,26 +1,23 @@
 document.querySelectorAll(".gallery").forEach((gallery) => {
-  if (gallery.dataset.carouselInit === "true") return;
-  gallery.dataset.carouselInit = "true";
-
   const track = gallery.querySelector(".gallery-track");
   if (!track) return;
 
-  // remove any old clones first
-  track.querySelectorAll(".is-clone").forEach((clone) => clone.remove());
+  // remove old clones if script runs again
+  track.querySelectorAll(".is-clone").forEach((el) => el.remove());
 
-  const originalSlides = Array.from(track.querySelectorAll(".slide"));
-  const realCount = originalSlides.length;
+  const realSlides = Array.from(track.querySelectorAll(".slide"));
+  const realCount = realSlides.length;
 
   if (realCount <= 1) return;
 
-  const firstClone = originalSlides[0].cloneNode(true);
-  const lastClone = originalSlides[realCount - 1].cloneNode(true);
+  const firstClone = realSlides[0].cloneNode(true);
+  const lastClone = realSlides[realCount - 1].cloneNode(true);
 
   firstClone.classList.add("is-clone");
   lastClone.classList.add("is-clone");
 
   track.appendChild(firstClone);
-  track.insertBefore(lastClone, originalSlides[0]);
+  track.insertBefore(lastClone, realSlides[0]);
 
   const slides = Array.from(track.querySelectorAll(".slide"));
 
@@ -37,9 +34,12 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     return window.innerWidth > 480;
   }
 
+  function getSlideWidth() {
+    return gallery.clientWidth;
+  }
+
   function getTranslateForIndex(index) {
-    const slide = slides[index];
-    return slide ? slide.offsetLeft : 0;
+    return index * getSlideWidth();
   }
 
   function applyTransform() {
@@ -93,10 +93,7 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   function normalizeLoopPosition() {
     if (currentIndex === 0) {
       instantJumpTo(realCount);
-      return;
-    }
-
-    if (currentIndex === realCount + 1) {
+    } else if (currentIndex === realCount + 1) {
       instantJumpTo(1);
     }
   }
@@ -175,7 +172,6 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
       } else {
         snapTo(currentIndex);
       }
-
       return;
     }
 
