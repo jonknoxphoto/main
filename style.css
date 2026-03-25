@@ -48,7 +48,7 @@ h1.title {
 
 /* FRAME */
 .gallery .frame {
-  width: 100%;
+  width: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
