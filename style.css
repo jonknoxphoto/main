@@ -107,14 +107,14 @@ h1.title {
   }
 
   .gallery .slide,
-  .gallery .item {
+  .gallery .slide {
     flex: 0 0 auto;
     min-width: auto;
     width: auto;
     max-width: auto;
   }
 
-  .gallery .frame {
+  .gallery .slide {
     width: 50%;
     height: 58dvh;
     max-height: 58dvh;
@@ -124,7 +124,7 @@ h1.title {
     overflow: hidden;
   }
 
-  .gallery .frame img {
+  .gallery .slide img {
     display: block;
     width: auto;
     height: auto;
