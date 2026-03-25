@@ -1,9 +1,8 @@
 document.querySelectorAll(".gallery").forEach((gallery) => {
   const track = gallery.querySelector(".gallery-track");
-  if (!track) return;
+  let realSlides = Array.from(track.querySelectorAll(".slide"));
 
-  const realSlides = Array.from(track.querySelectorAll(".slide"));
-  if (realSlides.length <= 1) return;
+  if (!track || realSlides.length <= 1) return;
 
   const firstClone = realSlides[0].cloneNode(true);
   const lastClone = realSlides[realSlides.length - 1].cloneNode(true);
@@ -29,8 +28,12 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     return window.innerWidth > 480;
   }
 
+  function getGap() {
+    return parseFloat(getComputedStyle(track).gap || "0");
+  }
+
   function getSlideWidth() {
-    return gallery.clientWidth;
+    return gallery.clientWidth + getGap();
   }
 
   function getTranslateForIndex(index) {
@@ -169,6 +172,7 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
       } else {
         snapTo(currentIndex);
       }
+
       return;
     }
 
@@ -192,8 +196,8 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   window.addEventListener("mouseup", onEnd);
 
   gallery.addEventListener("touchstart", onStart, { passive: true });
-  window.addEventListener("touchmove", onMove, { passive: true });
-  window.addEventListener("touchend", onEnd, { passive: true });
+  gallery.addEventListener("touchmove", onMove, { passive: true });
+  gallery.addEventListener("touchend", onEnd, { passive: true });
 
   gallery.addEventListener("dragstart", (e) => {
     e.preventDefault();
