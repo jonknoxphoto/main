@@ -51,7 +51,7 @@ h1.title {
 
 /* FRAME */
 .gallery .frame {
-  width: calc(100% - 20px); /* visible 20px separation */
+  width: calc(100% - 20px);
   margin: 0 auto;
   display: flex;
   justify-content: center;
@@ -130,7 +130,7 @@ h1.title {
   }
 
   .gallery .frame {
-    width: calc(100% - 20px); /* visible 20px separation */
+    width: calc(100% - 20px);
     margin: 0 auto;
     height: 40dvh;
     max-height: 40dvh;
