@@ -111,21 +111,21 @@ h1.title {
     display: none;
   }
 
- .gallery-track {
-  display: flex;
-  gap: 20px;
-  will-change: transform;
-}
+  .gallery-track {
+    gap: 0;
+  }
 
-.gallery .slide {
-  flex: 0 0 100%;
-  min-width: 100%;
-}
+  .gallery .slide {
+    flex: 0 0 100%;
+    min-width: 100%;
+    width: 100%;
+    max-width: 100%;
+  }
 
-.gallery .frame {
-  width: calc(100% - 20px);
-  margin: 0 auto;
-}
+  .gallery .frame {
+    width: 100%;
+    margin: 0;
+  }
 
   .gallery .frame img {
     width: auto;
