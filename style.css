@@ -31,7 +31,7 @@ h1.title {
   user-select: none;
 }
 
-/* desktop-only custom cursor arrow */
+/* cursor */
 .gallery::after {
   content: "";
   position: absolute;
@@ -48,9 +48,7 @@ h1.title {
   background-size: contain;
 }
 
-.gallery.show-cursor::after {
-  opacity: 1;
-}
+.gallery.show-cursor::after { opacity: 1; }
 
 .gallery.cursor-left::after {
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M15 5l-7 7 7 7' stroke='black' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
@@ -60,25 +58,21 @@ h1.title {
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M9 5l7 7-7 7' stroke='black' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
 }
 
-.gallery.is-dragging::after {
-  opacity: 0;
-}
+.gallery.is-dragging::after { opacity: 0; }
 
 /* TRACK */
 .gallery-track {
   display: flex;
   align-items: flex-start;
-  gap: 24px; /* space between slides */
+  gap: 0; /* ❗ no gap on desktop */
   will-change: transform;
-  transform: translateX(0);
 }
 
-/* EACH SLIDE */
+/* SLIDES */
 .gallery .slide {
-  flex: 0 0 calc(100% - 24px); /* keeps a gap visible */
-  min-width: calc(100% - 24px);
-  width: calc(100% - 24px);
-  max-width: calc(100% - 24px);
+  flex: 0 0 100%;
+  min-width: 100%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -87,28 +81,24 @@ h1.title {
 /* FRAME */
 .gallery .frame {
   width: 100%;
-  position: relative;
-  margin: 0;
   display: flex;
   justify-content: center;
   align-items: center;
-  overflow: hidden;
 }
 
-/* IMAGE */
+/* IMAGE (DESKTOP +15%) */
 .gallery .frame img {
   display: block;
-  width: 100%;
-  height: 100%;
+  width: auto;
+  height: 80.5vh; /* 70vh * 1.15 = 80.5vh */
   max-width: 100%;
+  max-height: 80.5vh;
   object-fit: contain;
   margin: 0 auto;
 }
 
-/* CAPTION UNDER IMAGE */
+/* CAPTION */
 .gallery .caption {
-  position: static;
-  transform: none;
   display: flex;
   flex-direction: column;
   gap: 1px;
@@ -117,34 +107,23 @@ h1.title {
   text-align: left;
   align-items: flex-start;
   color: #111;
-  text-shadow: none;
   pointer-events: none;
 }
 
-.gallery .caption span {
-  display: block;
-}
-
+/* MOBILE */
 @media (max-width: 480px) {
+
   .page {
     padding-left: 12px;
     padding-right: 12px;
-    width: 100%;
-    max-width: 100%;
     overflow-x: hidden;
   }
 
   .archive-grid {
     display: block;
-    width: 100%;
-    max-width: 100%;
   }
 
   .gallery {
-    width: 100%;
-    max-width: 100%;
-    margin: 0;
-    overflow: hidden;
     cursor: auto;
   }
 
@@ -152,44 +131,30 @@ h1.title {
     display: none;
   }
 
+  /* ✅ 20px gap ONLY mobile */
   .gallery-track {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
+    gap: 20px;
   }
 
   .gallery .slide {
-    flex: 0 0 100%;
-    min-width: 100%;
-    width: 100%;
-    max-width: 100%;
-    padding: 0;
+    flex: 0 0 calc(100% - 20px);
+    min-width: calc(100% - 20px);
+    width: calc(100% - 20px);
   }
 
   .gallery .frame {
     width: 100%;
-    height: 62svh;   /* important */
-    max-height: 62svh;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
   }
 
+  /* ✅ TRUE mobile fit */
   .gallery .frame img,
   .archive-grid img {
-    width: 100%;
-    height: 100%;
+    display: block;
+    width: auto;
+    height: min(55svh, 55dvh, 55vh);
     max-width: 100%;
-    max-height: 100%;
+    max-height: min(55svh, 55dvh, 55vh);
     object-fit: contain;
     margin: 0 auto;
-    display: block;
-  }
-
-  .gallery .caption {
-    width: 100%;
-    margin-top: 8px;
-    text-align: left;
-    align-items: flex-start;
   }
 }
