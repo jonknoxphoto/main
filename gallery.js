@@ -14,8 +14,6 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   let startTranslate = 0;
   let pointerX = 0;
 
-  let animationFrame = null;
-
   function isDesktop() {
     return window.innerWidth > 480;
   }
@@ -96,7 +94,7 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
       applyTransform();
     }
 
-    animationFrame = requestAnimationFrame(animate);
+    requestAnimationFrame(animate);
   }
 
   function getClientX(e) {
@@ -160,6 +158,8 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
       } else {
         snapTo(currentIndex);
       }
+
+      isDragging = false;
       return;
     }
 
@@ -199,15 +199,9 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
 
   window.addEventListener("resize", () => {
     snapTo(currentIndex, true);
-
-    if (!isDesktop()) {
-      clearDesktopCursor();
-    }
+    if (!isDesktop()) clearDesktopCursor();
   });
 
   snapTo(0, true);
-
-  if (!animationFrame) {
-    animate();
-  }
+  animate();
 });
