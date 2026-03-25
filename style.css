@@ -121,7 +121,7 @@ h1.title {
 
   .gallery-track {
     display: flex !important;
-    align-items: flex-start !important;
+    align-items: center!important;
     gap: 12px !important;
     width: 100% !important;
   }
