@@ -1,3 +1,5 @@
+show me where in my css will give space between images in my gallery slider without changing the display size 
+
 *,
 *::before,
 *::after {
@@ -20,76 +22,132 @@ h1.title {
   gap: 26px;
 }
 
-/* GALLERY */
+/* GALLERY WRAPPER */
 .gallery {
   width: 100%;
+  max-width: 100%;
   overflow: hidden;
   position: relative;
   cursor: none;
   touch-action: pan-y;
+  user-select: none;
+}
+
+/* desktop-only custom cursor arrow */
+.gallery::after {
+  content: "";
+  position: absolute;
+  left: var(--cursor-x, 50%);
+  top: var(--cursor-y, 50%);
+  width: 28px;
+  height: 28px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 20;
+  opacity: 0;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+.gallery.show-cursor::after {
+  opacity: 1;
+}
+
+.gallery.cursor-left::after {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M15 5l-7 7 7 7' stroke='black' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+}
+
+.gallery.cursor-right::after {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M9 5l7 7-7 7' stroke='black' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+}
+
+.gallery.is-dragging::after {
+  opacity: 0;
 }
 
 /* TRACK */
 .gallery-track {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
+  gap: 20px;
+  will-change: transform;
+  transform: translateX(0);
 }
 
-/* SLIDE (desktop layout: image + caption side by side) */
-.gallery .slide {
+/* EACH SLIDE = WHOLE ITEM */
+.gallery .item {
   flex: 0 0 100%;
   min-width: 100%;
   width: 100%;
+  max-width: 100%;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  gap: 10px;
 }
 
-/* IMAGE WRAPPER */
+/* FRAME */
 .gallery .frame {
+  width: 100%;
+  position: relative;
+  margin: 0;
   display: flex;
   justify-content: center;
   align-items: center;
-  flex: 0 1 auto;
-  min-width: 0;
 }
 
-/* DESKTOP IMAGE (bigger) */
+/* IMAGE */
 .gallery .frame img {
   display: block;
-  width: 90vw;
-  max-width: 1600px;
-  height: auto;
-  max-height: 95vh;
+  width: auto;
+  height: 70vh;
+  max-width: 100%;
+  max-height: 70vh;
+  margin: 0 auto;
   object-fit: contain;
 }
 
-/* DESKTOP CAPTION (right side) */
+/* CAPTION UNDER IMAGE */
 .gallery .caption {
-  width: 140px;
-  min-width: 140px;
+  position: static;
+  transform: none;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 1px;
+  width: 100%;
+  margin-top: 8px;
   text-align: left;
   align-items: flex-start;
   color: #111;
+  text-shadow: none;
   pointer-events: none;
 }
 
+.gallery .caption span {
+  display: block;
+}
+
+/* MOBILE */
 @media (max-width: 480px) {
   .page {
-    padding-left: 12px;
-    padding-right: 12px;
+    padding-left: 20px;
+    padding-right: 20px;
+    width: 100%;
+    max-width: 100%;
     overflow-x: hidden;
   }
 
   .archive-grid {
     display: block;
+    width: 100%;
+    max-width: 100%;
   }
 
   .gallery {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    overflow: hidden;
     cursor: auto;
   }
 
@@ -98,51 +156,35 @@ h1.title {
   }
 
   .gallery-track {
-    display: flex;
-    align-items: flex-start;
+    gap: 00;
   }
 
-  .gallery .slide {
-    flex: 0 0 calc(100% - 20px);
-    min-width: calc(100% - 20px);
-    width: calc(100% - 20px);
-    max-width: calc(100% - 20px);
-    margin-right: 20px;
-
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    gap: 0;
-  }
-
-  .gallery .slide:last-child {
-    margin-right: 0;
+  .gallery .item {
+    flex: 0 0 100%;
+    min-width: 100%;
+    width: 100%;
+    padding: 20;
   }
 
   .gallery .frame {
     width: 100%;
-    max-width: 100%;
-    min-height: 0;
-    display: flex;
     justify-content: center;
     align-items: center;
   }
 
   .gallery .frame img,
   .archive-grid img {
-    display: block !important;
-    width: 100% !important;
-    height: auto !important;
-    max-width: 100% !important;
-    max-height: 40dvh !important;
-    object-fit: contain !important;
-    margin: 0 auto !important;
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 75vh;
+    margin: 0 auto;
+    object-fit: contain;
   }
 
   .gallery .caption {
     width: 100%;
-    min-width: 0;
     margin-top: 8px;
     text-align: left;
     align-items: flex-start;
