@@ -6,8 +6,6 @@
   cursor: none;
   touch-action: pan-y;
   user-select: none;
-  display: flex;
-  align-items: center;
 }
 
 .gallery-track {
@@ -15,7 +13,6 @@
   gap: 0;
   will-change: transform;
   transform: translate3d(0, 0, 0);
-  align-items: center;
 }
 
 .gallery .slide {
@@ -23,50 +20,33 @@
   min-width: 100%;
   width: 100%;
   max-width: 100%;
-
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
 }
 
-/* FRAME */
 .gallery .frame {
   width: 100%;
   height: 70vh;
-
   display: flex;
   justify-content: center;
   align-items: center;
-
   overflow: hidden;
 }
 
-/* MEDIA = image width reference */
-.gallery .media {
-  display: inline-block;
-  max-width: 100%;
-  max-height: 100%;
-}
-
-/* IMAGE */
-.gallery .media img {
+.gallery .frame img {
   display: block;
-
   width: auto;
   height: auto;
-
   max-width: 100%;
-  max-height: 70vh;
-
+  max-height: 100%;
+  margin: 0 auto;
   object-fit: contain;
   object-position: center center;
 }
 
-/* CAPTION aligned to image width */
 .gallery .caption {
-  width: auto;
-  max-width: none;
+  width: 100%;
   margin-top: 8px;
   text-align: left;
   font-size: 10px;
@@ -75,16 +55,6 @@
   pointer-events: none;
 }
 
-/* DESKTOP: lock caption to image left edge */
-.gallery .slide {
-  align-items: center;
-}
-
-.gallery .caption {
-  align-self: center; /* centers with image block */
-}
-
-/* MOBILE */
 @media (max-width: 480px) {
   .gallery {
     cursor: auto;
@@ -98,19 +68,18 @@
     height: 60vh;
   }
 
-  .gallery .media img {
+  .gallery .frame img {
     max-width: 100%;
-    max-height: 60vh;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    margin: 0 auto;
+    object-fit: contain;
+    object-position: center center;
   }
 
-.gallery .caption {
-  width: auto;
-  max-width: none;
-  margin-top: 8px;
-  text-align: left;
-  font-size: 10px;
-  line-height: 1.2;
-  color: #111;
-  pointer-events: none;
-}
+  .gallery .caption {
+    font-size: 9px;
+    margin-top: 8px;
+  }
 }
