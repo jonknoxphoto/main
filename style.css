@@ -180,8 +180,8 @@ h1.title {
   .gallery .frame img,
   .archive-grid img {
     display: block;
-    width: 100%;
-    max-width: 100%;
+    width: auto;
+    max-width: auto;
     height: auto;
     max-height: 78vh;
     object-fit: contain;
