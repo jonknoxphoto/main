@@ -29,13 +29,12 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   }
 
 function getGap() {
-  const styles = getComputedStyle(track);
-  return parseFloat(styles.columnGap || styles.gap || "0");
+  return 0;
 }
 
 function getSlideWidth() {
-  const slide = slides[currentIndex] || slides[1] || slides[0];
-  if (!slide) return gallery.clientWidth;
+  return gallery.clientWidth;
+}
 
   const slideWidth = slide.getBoundingClientRect().width;
   return slideWidth + getGap();
