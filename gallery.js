@@ -29,10 +29,13 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     return window.innerWidth > 480;
   }
 
+  function getSlidePositions() {
+    return slides.map((slide) => slide.offsetLeft);
+  }
+
   function getTranslateForIndex(index) {
-    const slide = slides[index];
-    if (!slide) return 0;
-    return slide.offsetLeft;
+    const positions = getSlidePositions();
+    return positions[index] ?? 0;
   }
 
   function applyTransform() {
@@ -88,16 +91,22 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
 
     if (currentIndex === 0) {
       instantJumpTo(lastIndex - 1);
-    } else if (currentIndex === lastIndex) {
-      instantJumpTo(1);
+      return true;
     }
+
+    if (currentIndex === lastIndex) {
+      instantJumpTo(1);
+      return true;
+    }
+
+    return false;
   }
 
   function animate() {
     if (!isDragging) {
       currentTranslate += (targetTranslate - currentTranslate) * 0.14;
 
-      if (Math.abs(targetTranslate - currentTranslate) < 0.25) {
+      if (Math.abs(targetTranslate - currentTranslate) < 0.5) {
         currentTranslate = targetTranslate;
         applyTransform();
         normalizeLoopPosition();
@@ -167,6 +176,7 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
       } else {
         snapTo(currentIndex);
       }
+
       return;
     }
 
