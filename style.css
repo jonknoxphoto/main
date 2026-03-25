@@ -20,6 +20,7 @@ h1.title {
   gap: 26px;
 }
 
+/* GALLERY */
 .gallery {
   width: 100%;
   overflow: hidden;
@@ -32,22 +33,23 @@ h1.title {
 .gallery-track {
   display: flex;
   align-items: flex-start;
-  gap: 20px;
+  gap: 0;
   will-change: transform;
   transform: translate3d(0, 0, 0);
-  padding: 0 7.5%;
 }
 
+/* SLIDE */
 .gallery .slide {
-  flex: 0 0 85%;
-  min-width: 85%;
-  width: 85%;
-  max-width: 85%;
+  flex: 0 0 100%;
+  min-width: 100%;
+  width: 100%;
+  max-width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
+/* FRAME */
 .gallery .frame {
   width: 100%;
   display: flex;
@@ -56,50 +58,52 @@ h1.title {
   overflow: hidden;
 }
 
+/* DESKTOP IMAGE */
 .gallery .frame img {
   display: block;
   width: auto;
   height: 70vh;
   max-width: 100%;
   max-height: 70vh;
-  object-fit: contain;
   margin: 0 auto;
+  object-fit: contain;
+  pointer-events: none;
 }
 
+/* CAPTION */
 .gallery .caption {
+  position: static;
+  transform: none;
   display: flex;
   flex-direction: column;
   gap: 1px;
-  width: 100%;
-  margin-top: 8px;
+  width: min(100%, 860px);
+  margin: 8px auto 0;
   text-align: left;
   align-items: flex-start;
+  color: #111;
+  text-shadow: none;
+  pointer-events: none;
 }
 
-.caption .cap-title,
+.caption .cap-title {
+  font-weight: 600;
+  color: #111;
+}
+
 .caption .cap-meta {
-  margin: 0;
-  padding: 0;
+  font-weight: 400;
+  opacity: 0.7;
+  color: #111;
 }
 
+/* MOBILE */
 @media (max-width: 480px) {
   .page {
-    width: 100%;
-    max-width: 100%;
-    padding: 10px 14px 16px;
-    overflow-x: hidden;
-  }
-
-  .archive-grid {
-    display: block;
-    width: 100%;
-    max-width: 100%;
+    padding: 18px 14px 42px;
   }
 
   .gallery {
-    width: 100%;
-    max-width: 100%;
-    overflow: hidden;
     cursor: auto;
   }
 
@@ -108,50 +112,35 @@ h1.title {
   }
 
   .gallery-track {
-    gap: 16px;
-    padding: 0 10%;
-    align-items: stretch;
+    gap: 0;
   }
 
   .gallery .slide {
-    flex: 0 0 80%;
-    min-width: 80%;
-    width: 80%;
-    max-width: 80%;
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
+    flex: 0 0 100%;
+    min-width: 100%;
+    width: 100%;
   }
 
   .gallery .frame {
     width: 100%;
-    height: 38dvh;
-    max-height: 38dvh;
-    flex: 0 0 38dvh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
   }
 
   .gallery .frame img {
-    display: block;
-    width: 100%;
-    height: 100%;
+    width: auto;
+    height: auto;
     max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-    margin: 0 auto;
+    max-height: 84vh;
   }
 
   .gallery .caption {
     width: 100%;
-    max-width: 100%;
-    margin: 4px 0 0;
-    gap: 0;
+    margin-top: 8px;
     text-align: left;
     align-items: flex-start;
-    font-size: 8px;
-    line-height: 1.15;
+    font-size: 9px;
+  }
+
+  .archive-grid .item:last-child img {
+    margin-bottom: 20px;
   }
 }
