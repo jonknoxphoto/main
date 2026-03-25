@@ -33,20 +33,19 @@ h1.title {
 .gallery-track {
   display: flex;
   align-items: flex-start;
-  margin: 0 -10px;
+  gap: 20px; /* REAL GAP */
   will-change: transform;
 }
 
 /* SLIDE */
 .gallery .slide {
-  flex: 0 0 100%;
-  min-width: 100%;
-  width: 100%;
-  max-width: 100%;
+  flex: 0 0 calc(100% - 20px);
+  min-width: calc(100% - 20px);
+  width: calc(100% - 20px);
+  max-width: calc(100% - 20px);
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 0 10px;
 }
 
 /* FRAME */
@@ -115,18 +114,17 @@ h1.title {
   .gallery-track {
     width: 100%;
     align-items: stretch;
-    margin: 0 -10px;
+    gap: 20px;
   }
 
   .gallery .slide {
-    flex: 0 0 100%;
-    min-width: 100%;
-    width: 100%;
-    max-width: 100%;
+    flex: 0 0 calc(100% - 20px);
+    min-width: calc(100% - 20px);
+    width: calc(100% - 20px);
+    max-width: calc(100% - 20px);
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    padding: 0 10px;
   }
 
   .gallery .frame {
@@ -155,18 +153,11 @@ h1.title {
     max-width: 100%;
     flex: 0 0 auto;
     margin: 4px 0 0;
-    padding: 0 10px;
     gap: 0;
     text-align: left;
     align-items: flex-start;
     font-size: 8px;
     line-height: 1.15;
-  }
-
-  .caption .cap-title,
-  .caption .cap-meta {
-    margin: 0;
-    padding: 0;
   }
 
   .archive-grid .item:last-child img {
