@@ -69,6 +69,24 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     track.style.transform = `translate3d(${-currentTranslate}px, 0, 0)`;
   }
 
+  function alignCaptionsToImages() {
+    slides.forEach((slide) => {
+      const img = slide.querySelector(".frame img");
+      const caption = slide.querySelector(".caption");
+      const frame = slide.querySelector(".frame");
+
+      if (!img || !caption || !frame) return;
+
+      const imgRect = img.getBoundingClientRect();
+      const frameRect = frame.getBoundingClientRect();
+
+      const leftOffset = imgRect.left - frameRect.left;
+
+      caption.style.width = `${imgRect.width}px`;
+      caption.style.marginLeft = `${leftOffset}px`;
+    });
+  }
+
   function updateDesktopCursor(e) {
     if (!isDesktop() || isPointerDown || e.clientX === undefined) return;
 
@@ -95,6 +113,7 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     if (immediate) {
       currentTranslate = targetTranslate;
       applyTransform();
+      alignCaptionsToImages();
     }
   }
 
@@ -103,6 +122,7 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     currentTranslate = getTranslateForIndex(index);
     targetTranslate = currentTranslate;
     applyTransform();
+    alignCaptionsToImages();
   }
 
   function goNext() {
@@ -140,6 +160,7 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
         currentTranslate = targetTranslate;
         applyTransform();
         normalizeLoopPosition();
+        alignCaptionsToImages();
       } else {
         applyTransform();
       }
@@ -271,12 +292,19 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   window.addEventListener("resize", () => {
     slides = Array.from(track.querySelectorAll(".slide"));
     instantJumpTo(currentIndex);
+    alignCaptionsToImages();
 
     if (!isDesktop()) {
       clearDesktopCursor();
     }
   });
 
+  window.addEventListener("load", () => {
+    slides = Array.from(track.querySelectorAll(".slide"));
+    alignCaptionsToImages();
+  });
+
   instantJumpTo(1);
+  alignCaptionsToImages();
   animate();
 });
