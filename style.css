@@ -33,7 +33,7 @@ h1.title {
 .gallery-track {
   display: flex;
   align-items: flex-start;
-  gap: 20px;
+  margin: 0 -10px;
   will-change: transform;
 }
 
@@ -46,6 +46,7 @@ h1.title {
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 0 10px;
 }
 
 /* FRAME */
@@ -79,6 +80,12 @@ h1.title {
   align-items: flex-start;
 }
 
+.caption .cap-title,
+.caption .cap-meta {
+  margin: 0;
+  padding: 0;
+}
+
 /* ---------------- MOBILE ---------------- */
 @media (max-width: 480px) {
   .page {
@@ -106,9 +113,9 @@ h1.title {
   }
 
   .gallery-track {
-    gap: 0;
     width: 100%;
     align-items: stretch;
+    margin: 0 -10px;
   }
 
   .gallery .slide {
@@ -119,9 +126,9 @@ h1.title {
     display: flex;
     flex-direction: column;
     align-items: stretch;
+    padding: 0 10px;
   }
 
-  /* smaller image area */
   .gallery .frame {
     width: 100%;
     height: 40dvh;
@@ -143,13 +150,12 @@ h1.title {
     margin: 0 auto;
   }
 
-  /* smaller caption area */
   .gallery .caption {
     width: 100%;
     max-width: 100%;
     flex: 0 0 auto;
     margin: 4px 0 0;
-    padding: 0;
+    padding: 0 10px;
     gap: 0;
     text-align: left;
     align-items: flex-start;
