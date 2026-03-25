@@ -2,12 +2,11 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   const track = gallery.querySelector(".gallery-track");
   if (!track) return;
 
-  // clean up old clones if this runs again
+  // remove old clones if this script runs again
   track.querySelectorAll(".is-clone").forEach((el) => el.remove());
 
   const realSlides = Array.from(track.querySelectorAll(".slide"));
   const realCount = realSlides.length;
-
   if (realCount <= 1) return;
 
   const firstClone = realSlides[0].cloneNode(true);
@@ -19,7 +18,7 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   track.appendChild(firstClone);
   track.insertBefore(lastClone, realSlides[0]);
 
-  const slides = Array.from(track.querySelectorAll(".slide"));
+  let slides = Array.from(track.querySelectorAll(".slide"));
 
   let currentIndex = 1; // first real slide
   let currentTranslate = 0;
@@ -34,12 +33,9 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     return window.innerWidth > 480;
   }
 
-  function getSlideWidth() {
-    return gallery.clientWidth;
-  }
-
   function getTranslateForIndex(index) {
-    return index * getSlideWidth();
+    const slide = slides[index];
+    return slide ? slide.offsetLeft : 0;
   }
 
   function applyTransform() {
@@ -83,27 +79,22 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   }
 
   function goNext() {
-    if (currentIndex === realCount) {
-      // go to clone of first slide, then jump to real first
-      snapTo(realCount + 1);
-    } else {
-      snapTo(currentIndex + 1);
-    }
+    snapTo(currentIndex + 1);
   }
 
   function goPrev() {
-    if (currentIndex === 1) {
-      // go to clone of last slide, then jump to real last
-      snapTo(0);
-    } else {
-      snapTo(currentIndex - 1);
-    }
+    snapTo(currentIndex - 1);
   }
 
   function normalizeLoopPosition() {
+    // clone before first real slide
     if (currentIndex === 0) {
       instantJumpTo(realCount);
-    } else if (currentIndex === realCount + 1) {
+      return;
+    }
+
+    // clone after last real slide
+    if (currentIndex === realCount + 1) {
       instantJumpTo(1);
     }
   }
@@ -112,7 +103,7 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     if (!isDragging) {
       currentTranslate += (targetTranslate - currentTranslate) * 0.14;
 
-      if (Math.abs(targetTranslate - currentTranslate) < 0.25) {
+      if (Math.abs(targetTranslate - currentTranslate) < 0.5) {
         currentTranslate = targetTranslate;
         applyTransform();
         normalizeLoopPosition();
@@ -213,6 +204,7 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   });
 
   window.addEventListener("resize", () => {
+    slides = Array.from(track.querySelectorAll(".slide"));
     instantJumpTo(currentIndex);
     if (!isDesktop()) clearDesktopCursor();
   });
