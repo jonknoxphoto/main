@@ -33,16 +33,16 @@ h1.title {
 .gallery-track {
   display: flex;
   align-items: flex-start;
-  gap: 20px; /* REAL GAP */
+  gap: 20px;
   will-change: transform;
 }
 
 /* SLIDE */
 .gallery .slide {
-  flex: 0 0 calc(100% - 20px);
-  min-width: calc(100% - 20px);
-  width: calc(100% - 20px);
-  max-width: calc(100% - 20px);
+  flex: 0 0 100%;
+  min-width: 100%;
+  width: 100%;
+  max-width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -51,6 +51,7 @@ h1.title {
 /* FRAME */
 .gallery .frame {
   width: 100%;
+  padding: 0 10px; /* visible 20px between images */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -111,31 +112,33 @@ h1.title {
     display: none;
   }
 
-.gallery-track {
-  display: flex;
-  align-items: flex-start;
-  gap: 20px;
-  will-change: transform;
-}
+  .gallery-track {
+    width: 100%;
+    align-items: stretch;
+    gap: 20px;
+  }
 
-.gallery .slide {
-  flex: 0 0 100%;
-  min-width: 100%;
-  width: 100%;
-  max-width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+  .gallery .slide {
+    flex: 0 0 100%;
+    min-width: 100%;
+    width: 100%;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
 
-.gallery .frame {
-  width: 100%;
-  padding: 0 10px; /* visible 20px total gutter */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
-}
+  .gallery .frame {
+    width: 100%;
+    height: 40dvh;
+    max-height: 40dvh;
+    flex: 0 0 40dvh;
+    padding: 0 10px; /* visible 20px between images */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+  }
 
   .gallery .frame img {
     display: block;
