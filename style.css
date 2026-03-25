@@ -144,6 +144,9 @@ h1.title {
   .gallery {
     cursor: auto;
     overflow: hidden;
+    min-height: 100svh;
+    display: flex;
+    align-items: center;
   }
 
   .gallery::after {
@@ -152,10 +155,9 @@ h1.title {
 
   .gallery-track {
     display: flex;
-    align-items: stretch;
+    align-items: center;
     gap: 12px;
-    will-change: transform;
-    transform: translate3d(0, 0, 0);
+    width: 100%;
   }
 
   .gallery .slide {
@@ -164,19 +166,19 @@ h1.title {
     width: calc(100% - 12px);
     max-width: calc(100% - 12px);
 
-    height: 78vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    height: 100svh;
     position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .gallery .frame {
     width: 100%;
     height: 60vh;
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
     overflow: hidden;
   }
 
@@ -186,20 +188,19 @@ h1.title {
     height: auto;
     max-width: 100%;
     max-height: 100%;
-    object-fit: contain;
     margin: 0;
+    object-fit: contain;
   }
 
   .gallery .caption {
     position: absolute;
     left: 0;
-    bottom: 6px;
+    bottom: 10px;
     width: 100%;
     margin: 0;
-    padding: 0;
+    font-size: 9px;
     text-align: left;
     align-items: flex-start;
-    font-size: 9px;
     pointer-events: none;
   }
 
