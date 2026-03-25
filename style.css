@@ -127,26 +127,19 @@ h1.title {
   }
 
   .gallery .slide {
-    position: relative;
     flex: 0 0 calc(100% - 12px) !important;
     min-width: calc(100% - 12px) !important;
     width: calc(100% - 12px) !important;
     max-width: calc(100% - 12px) !important;
-    display: flex !important;
-    flex-direction: column !important;
-    justify-content: flex-start !important;
-    align-items: center !important;
+    position: relative !important;
+    display: block !important;
   }
 
   .gallery .frame {
     width: 100% !important;
     height: 60vh !important;
-    display: flex !important;
-    justify-content: center !important;
-    align-items: flex-start !important;
-    overflow: hidden !important;
     position: relative !important;
-    padding-top: 0 !important;
+    overflow: hidden !important;
   }
 
   .gallery .frame img {
@@ -155,20 +148,19 @@ h1.title {
     height: auto !important;
     max-width: 100% !important;
     max-height: none !important;
-    margin: 0 !important;
+    margin: 0 auto !important;
     object-fit: contain !important;
-    align-self: flex-start !important;
   }
 
-.gallery .caption {
-  position: absolute;
-  left: 0;
-  bottom: -18px;
-  width: 100%;
-  margin: 0;
-  text-align: left;
-  align-items: flex-start;
-  pointer-events: none;
-}
+  .gallery .caption {
+    position: absolute !important;
+    left: 0 !important;
+    top: calc(60vh + 8px) !important;
+    width: 100% !important;
+    margin: 0 !important;
+    text-align: left !important;
+    align-items: flex-start !important;
+    font-size: 9px !important;
+    pointer-events: none !important;
   }
 }
