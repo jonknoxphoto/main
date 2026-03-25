@@ -2,7 +2,7 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   const track = gallery.querySelector(".gallery-track");
   if (!track) return;
 
-  let realSlides = Array.from(track.querySelectorAll(".slide"));
+  const realSlides = Array.from(track.querySelectorAll(".slide"));
   if (realSlides.length <= 1) return;
 
   const firstClone = realSlides[0].cloneNode(true);
@@ -29,16 +29,12 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     return window.innerWidth > 480;
   }
 
-  function getGap() {
-    return 0;
-  }
-
   function getSlideWidth() {
     return gallery.clientWidth;
   }
 
   function getTranslateForIndex(index) {
-    return index * (getSlideWidth() + getGap());
+    return index * getSlideWidth();
   }
 
   function applyTransform() {
@@ -173,7 +169,6 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
       } else {
         snapTo(currentIndex);
       }
-
       return;
     }
 
