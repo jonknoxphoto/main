@@ -156,23 +156,31 @@ h1.title {
     width: 100%;
   }
 
+  /* CENTER FRAME */
   .gallery-track .frame {
     flex: 0 0 100% !important;
     min-width: 100% !important;
     width: 100% !important;
     max-width: 100% !important;
-    display: block !important;
+
+    display: flex !important;
+    justify-content: center;   /* centers horizontally */
+    align-items: center;
   }
 
-  /* IMAGE FULL WIDTH */
+  /* CENTER IMAGE (no forced full width) */
   .gallery .frame img,
   .gallery-track .frame img,
   .archive-grid img {
     display: block !important;
-    width: 100% !important;
+    width: auto !important;        /* key change */
     height: auto !important;
-    max-width: 100% !important;
-    max-height: none !important;
+
+    max-width: 100% !important;    /* prevents overflow */
+    max-height: 75vh;              /* optional: keeps nice vertical fit */
+
+    margin: 0 auto;
+    object-fit: contain;
   }
 
   /* CAPTION UNDER IMAGE */
@@ -186,12 +194,8 @@ h1.title {
     width: 100% !important;
 
     margin-top: 8px;
-    padding: 0;
 
-    text-align: left;
-    align-items: flex-start;
-    gap: 2px;
-
-    color: #111;
+    text-align: center; /* optional: center text with image */
+    align-items: center;
   }
 }
