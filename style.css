@@ -109,8 +109,8 @@ a {
   position: absolute;
   left: var(--cursor-x, 50%);
   top: var(--cursor-y, 50%);
-  width: 41px;
-  height: 35px;
+  width: 28px;
+  height: 28px;
   transform: translate(-50%, -50%);
   pointer-events: none;
   z-index: 20;
@@ -273,8 +273,10 @@ a {
 
   .gallery .frame {
     width: 100%;
-    min-height: 84vh;
+    min-height: auto;
     padding: 0 10px;
+    display: flex;
+    align-items: flex-end;
   }
 
   .gallery .frame img {
@@ -282,11 +284,12 @@ a {
     height: auto;
     max-width: 100%;
     max-height: 84vh;
+    margin-bottom: 0;
   }
 
   .gallery .caption {
     width: 100%;
-    margin-top: 4px;
+    margin-top: 2px;
     text-align: left;
     align-items: flex-start;
     font-size: 9px;
