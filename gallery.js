@@ -28,6 +28,7 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   let isPointerDown = false;
   let isDragging = false;
   let isScrollingY = false;
+  let isWrapping = false;
 
   let startX = 0;
   let startY = 0;
@@ -41,14 +42,14 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     return window.innerWidth > 480;
   }
 
-function getTranslateForIndex(index) {
-  const slide = slides[index];
-  if (!slide) return 0;
+  function getTranslateForIndex(index) {
+    const slide = slides[index];
+    if (!slide) return 0;
 
-  const slideCenter = slide.offsetLeft + slide.offsetWidth / 2;
-  const galleryCenter = gallery.clientWidth / 2;
+    const slideCenter = slide.offsetLeft + slide.offsetWidth / 2;
+    const galleryCenter = gallery.clientWidth / 2;
 
-  return slideCenter - galleryCenter;
+    return slideCenter - galleryCenter;
   }
 
   function applyTransform() {
@@ -92,17 +93,23 @@ function getTranslateForIndex(index) {
   }
 
   function goNext() {
-    if (currentIndex >= realCount) {
+    if (isWrapping) return;
+
+    if (currentIndex === realCount) {
+      isWrapping = true;
       setIndex(realCount + 1);
-    } else {
+    } else if (currentIndex < realCount) {
       setIndex(currentIndex + 1);
     }
   }
 
   function goPrev() {
-    if (currentIndex <= 1) {
+    if (isWrapping) return;
+
+    if (currentIndex === 1) {
+      isWrapping = true;
       setIndex(0);
-    } else {
+    } else if (currentIndex > 1) {
       setIndex(currentIndex - 1);
     }
   }
@@ -110,12 +117,17 @@ function getTranslateForIndex(index) {
   function normalizeLoopPosition() {
     if (currentIndex === 0) {
       instantJumpTo(realCount);
-      return;
+      isWrapping = false;
+      return true;
     }
 
     if (currentIndex === realCount + 1) {
       instantJumpTo(1);
+      isWrapping = false;
+      return true;
     }
+
+    return false;
   }
 
   function animate() {
@@ -125,7 +137,10 @@ function getTranslateForIndex(index) {
       if (Math.abs(targetTranslate - currentTranslate) < 0.35) {
         currentTranslate = targetTranslate;
         applyTransform();
-        normalizeLoopPosition();
+
+        if (!normalizeLoopPosition()) {
+          isWrapping = false;
+        }
       } else {
         applyTransform();
       }
@@ -147,6 +162,8 @@ function getTranslateForIndex(index) {
   }
 
   function onStart(e) {
+    if (isWrapping) return;
+
     isPointerDown = true;
     isDragging = false;
     isScrollingY = false;
@@ -216,12 +233,11 @@ function getTranslateForIndex(index) {
     }
 
     const dx = getClientX(e) - startX;
-    const absDx = Math.abs(dx);
     const threshold = gallery.clientWidth * (isDesktop() ? 0.12 : 0.1);
     const flickVelocity = 0.45;
 
     if (!isDragging) {
-      if (isDesktop() && e.clientX !== undefined) {
+      if (isDesktop() && e.clientX !== undefined && !isWrapping) {
         const rect = gallery.getBoundingClientRect();
         const clickX = e.clientX - rect.left;
 
@@ -235,15 +251,21 @@ function getTranslateForIndex(index) {
       } else {
         setIndex(currentIndex);
       }
+
+      isDragging = false;
+      isScrollingY = false;
+      velocityX = 0;
       return;
     }
 
-    if (dx < -threshold || velocityX < -flickVelocity) {
-      goNext();
-    } else if (dx > threshold || velocityX > flickVelocity) {
-      goPrev();
-    } else {
-      setIndex(currentIndex);
+    if (!isWrapping) {
+      if (dx < -threshold || velocityX < -flickVelocity) {
+        goNext();
+      } else if (dx > threshold || velocityX > flickVelocity) {
+        goPrev();
+      } else {
+        setIndex(currentIndex);
+      }
     }
 
     isDragging = false;
@@ -270,7 +292,14 @@ function getTranslateForIndex(index) {
 
   window.addEventListener("resize", () => {
     slides = Array.from(track.querySelectorAll(".slide"));
-    instantJumpTo(currentIndex);
+    instantJumpTo(
+      currentIndex <= 0 ? realCount :
+      currentIndex >= realCount + 1 ? 1 :
+      currentIndex
+    );
+
+    isWrapping = false;
+
     if (!isDesktop()) clearDesktopCursor();
   });
 
