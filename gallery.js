@@ -75,9 +75,48 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     gallery.classList.remove("show-cursor", "cursor-left", "cursor-right");
   }
 
+  function warmImage(img) {
+    if (!img || img.dataset.warmed === "true") return;
+
+    img.dataset.warmed = "true";
+    img.loading = "eager";
+    img.fetchPriority = "high";
+
+    if (img.dataset.src && !img.src) img.src = img.dataset.src;
+    if (img.dataset.srcset && !img.srcset) img.srcset = img.dataset.srcset;
+
+    if (img.decode) {
+      img.decode().catch(() => {});
+    } else {
+      const preloader = new Image();
+      preloader.src = img.currentSrc || img.src;
+    }
+  }
+
+  function warmSlide(index) {
+    const slide = slides[index];
+    if (!slide) return;
+
+    slide.querySelectorAll("img").forEach(warmImage);
+  }
+
+  function warmSlides(centerIndex) {
+    // warm current + neighbors so they appear during drag, not after snap
+    warmSlide(centerIndex);
+    warmSlide(centerIndex - 1);
+    warmSlide(centerIndex + 1);
+
+    // extra help for loop edges
+    if (centerIndex === 1) warmSlide(realCount + 1);
+    if (centerIndex === realCount) warmSlide(0);
+    if (centerIndex === 0) warmSlide(realCount);
+    if (centerIndex === realCount + 1) warmSlide(1);
+  }
+
   function setIndex(index, immediate = false) {
     currentIndex = index;
     targetTranslate = getTranslateForIndex(index);
+    warmSlides(index);
 
     if (immediate) {
       currentTranslate = targetTranslate;
@@ -90,6 +129,7 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     currentTranslate = getTranslateForIndex(index);
     targetTranslate = currentTranslate;
     applyTransform();
+    warmSlides(index);
   }
 
   function goNext() {
@@ -178,6 +218,9 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
 
     gallery.classList.add("is-dragging");
     clearDesktopCursor();
+
+    // preload neighbors right when interaction starts
+    warmSlides(currentIndex);
   }
 
   function onMove(e) {
@@ -217,6 +260,15 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
       const dragResistance = isDesktop() ? 1 : 0.92;
       currentTranslate = startTranslate - dx * dragResistance;
       applyTransform();
+
+      // while dragging, preload the direction you're heading toward
+      if (dx < 0) {
+        warmSlide(currentIndex + 1);
+        if (currentIndex === realCount) warmSlide(realCount + 1);
+      } else if (dx > 0) {
+        warmSlide(currentIndex - 1);
+        if (currentIndex === 1) warmSlide(0);
+      }
     }
   }
 
@@ -304,5 +356,6 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   });
 
   instantJumpTo(1);
+  warmSlides(1);
   animate();
 });
