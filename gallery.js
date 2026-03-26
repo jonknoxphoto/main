@@ -25,32 +25,32 @@
     let lastMoveTime = 0;
     let velocityX = 0;
 
-    function isDesktop() {
-      return window.innerWidth > 480;
-    }
+  function isDesktop() {
+  return window.innerWidth > 480;
+}
 
-    function updateDesktopCursor(e) {
-      if (!isDesktop() || isPointerDown || e.clientX === undefined) return;
+function updateDesktopCursor(e) {
+  if (!isDesktop() || isPointerDown || e.clientX === undefined) return;
 
-      const rect = gallery.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      const centerX = rect.width / 2;
+  const rect = gallery.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+  const centerX = rect.width / 2;
 
-      gallery.style.setProperty("--cursor-x", `${x}px`);
-      gallery.style.setProperty("--cursor-y", `${y}px`);
-      gallery.classList.add("show-cursor");
-      gallery.classList.toggle("cursor-left", x < centerX);
-      gallery.classList.toggle("cursor-right", x >= centerX);
-    }
+  gallery.style.setProperty("--cursor-x", `${x}px`);
+  gallery.style.setProperty("--cursor-y", `${y}px`);
+  gallery.classList.add("show-cursor");
+  gallery.classList.toggle("cursor-left", x < centerX);
+  gallery.classList.toggle("cursor-right", x >= centerX);
+}
 
-    function clearDesktopCursor() {
-      gallery.classList.remove("show-cursor", "cursor-left", "cursor-right");
-    }
+function clearDesktopCursor() {
+  gallery.classList.remove("show-cursor", "cursor-left", "cursor-right");
+}
 
-    gallery.addEventListener("mouseenter", updateDesktopCursor);
-    gallery.addEventListener("mousemove", updateDesktopCursor);
-    gallery.addEventListener("mouseleave", clearDesktopCursor);
+gallery.addEventListener("mouseenter", updateDesktopCursor);
+gallery.addEventListener("mousemove", updateDesktopCursor);
+gallery.addEventListener("mouseleave", clearDesktopCursor);
 
     if (realCount <= 1) {
       return;
