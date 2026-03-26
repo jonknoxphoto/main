@@ -109,8 +109,8 @@ a {
   position: absolute;
   left: var(--cursor-x, 50%);
   top: var(--cursor-y, 50%);
-  width: 28px;
-  height: 28px;
+  width: 41px;
+  height: 35px;
   transform: translate(-50%, -50%);
   pointer-events: none;
   z-index: 20;
