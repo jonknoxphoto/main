@@ -117,7 +117,7 @@ a {
   opacity: 0;
   background-repeat: no-repeat;
   background-position: center;
-  background-size: 20px 20px;
+  background-size: 24px 24px;
 }
 
 .gallery.show-cursor::after {
@@ -125,11 +125,11 @@ a {
 }
 
 .gallery.cursor-left::after {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><polygon points='14,7 9,12 14,17' fill='%23111' fill-opacity='0.5' stroke='%23111' stroke-opacity='0.9' stroke-width='2' stroke-linejoin='round'/></svg>");
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><polygon points='15,6 8,12 15,18' fill='%23111' fill-opacity='0.4'/></svg>");
 }
 
 .gallery.cursor-right::after {
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><polygon points='10,7 15,12 10,17' fill='%23111' fill-opacity='0.5' stroke='%23111' stroke-opacity='0.9' stroke-width='2' stroke-linejoin='round'/></svg>");
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><polygon points='9,6 16,12 9,18' fill='%23111' fill-opacity='0.4'/></svg>");
 }
 
 .gallery.is-dragging::after {
@@ -181,7 +181,7 @@ a {
   flex-direction: column;
   gap: 1px;
   width: min(100%, 860px);
-  margin: 8px auto 0;
+  margin: 4px auto 0;
   text-align: left;
   align-items: flex-start;
   color: #111;
@@ -225,6 +225,12 @@ a {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+}
+
+@media (min-width: 900px) {
+  .archive-grid {
+    gap: 42px;
+  }
 }
 
 @media (max-width: 700px) {
@@ -280,7 +286,7 @@ a {
 
   .gallery .caption {
     width: 100%;
-    margin-top: 8px;
+    margin-top: 4px;
     text-align: left;
     align-items: flex-start;
     font-size: 9px;
