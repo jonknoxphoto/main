@@ -125,25 +125,12 @@ a {
 }
 
 .gallery.cursor-left::after {
-  background-image: url("data:image/svg+xml;utf8,
-  <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'>
-    <polygon points='14,6 8,12 14,18'
-      fill='rgba(17,17,17,0.5)'
-      stroke='rgba(17,17,17,0.9)'
-      stroke-width='2'
-      stroke-linejoin='round'/>
-  </svg>");
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M15 5l-7 7 7 7' stroke='black' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
 }
 
 .gallery.cursor-right::after {
-  background-image: url("data:image/svg+xml;utf8,
-  <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'>
-    <polygon points='10,6 16,12 10,18'
-      fill='rgba(17,17,17,0.5)'
-      stroke='rgba(17,17,17,0.9)'
-      stroke-width='2'
-      stroke-linejoin='round'/>
-  </svg>");
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M9 5l7 7-7 7' stroke='black' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+
 }
 
 .gallery.is-dragging::after {
