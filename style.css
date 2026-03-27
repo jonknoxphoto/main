@@ -46,9 +46,7 @@ a {
   line-height: 1.5;
 }
 
-.header-left {
-  color: #666;
-}
+.header-left { color: #666; }
 
 .header-center {
   text-align: center;
@@ -64,13 +62,8 @@ a {
   gap: 18px;
 }
 
-.header-right a {
-  color: #444;
-}
-
-.header-right a:hover {
-  color: #111;
-}
+.header-right a { color: #444; }
+.header-right a:hover { color: #111; }
 
 .section-label,
 .caption,
@@ -82,18 +75,14 @@ a {
 }
 
 .section-label,
-.footer {
-  color: #666;
-}
+.footer { color: #666; }
 
 .archive-grid {
   display: grid;
   gap: 26px;
 }
 
-.item {
-  position: relative;
-}
+.item { position: relative; }
 
 .gallery {
   width: 100%;
@@ -104,6 +93,7 @@ a {
   user-select: none;
 }
 
+/* CURSOR */
 .gallery::after {
   content: "";
   position: absolute;
@@ -120,9 +110,7 @@ a {
   background-size: 24px 24px;
 }
 
-.gallery.show-cursor::after {
-  opacity: 1;
-}
+.gallery.show-cursor::after { opacity: 1; }
 
 .gallery.cursor-left::after {
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><polygon points='15,6 8,12 15,18' fill='%23111' fill-opacity='0.4'/></svg>");
@@ -132,11 +120,9 @@ a {
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><polygon points='9,6 16,12 9,18' fill='%23111' fill-opacity='0.4'/></svg>");
 }
 
-.gallery.is-dragging::after {
-  opacity: 0;
-}
+.gallery.is-dragging::after { opacity: 0; }
 
-/* default / mobile swipe layout */
+/* MOBILE / DEFAULT */
 .gallery-track {
   display: flex;
   align-items: center;
@@ -161,98 +147,39 @@ a {
   display: flex;
   justify-content: center;
   align-items: center;
-  position: relative;
 }
 
 .gallery .frame img {
   display: block;
-  width: auto;
-  height: auto;
   max-width: 100%;
   max-height: 82.6vh;
-  margin: 0 auto;
   object-fit: contain;
   pointer-events: none;
 }
 
 .gallery .caption {
-  position: static;
-  transform: none;
   display: flex;
   flex-direction: column;
   gap: 1px;
   width: min(100%, 860px);
   margin: 4px auto 0;
-  text-align: left;
-  align-items: flex-start;
-  color: #111;
-  text-shadow: none;
-  pointer-events: none;
 }
 
-.caption .cap-title {
-  font-weight: 600;
-  color: #111;
-}
-
-.caption .cap-meta {
-  font-weight: 400;
-  opacity: 0.7;
-  color: #111;
-}
-
-.info {
-  margin-top: 28px;
-  text-align: left;
-}
-
-.info p {
-  margin: 8px 0 18px;
-  max-width: 720px;
-  text-transform: none;
-  letter-spacing: normal;
-  font-size: 14px;
-  line-height: 1.5;
-  color: #111;
-}
-
-.contact-link {
-  display: inline-block;
-  margin-top: 4px;
-}
-
-.footer {
-  margin-top: 20px;
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-/* desktop fade mode */
+/* 🔥 DESKTOP HARD CUT MODE */
 @media (min-width: 481px) {
-  .gallery.is-fade {
-    min-height: calc(82.6vh + 28px);
-  }
-
   .gallery.is-fade .gallery-track {
     display: block;
     position: relative;
-    width: 100%;
-    min-height: calc(82.6vh + 28px);
     transform: none !important;
-    gap: 0;
   }
 
   .gallery.is-fade .slide {
     position: absolute;
     inset: 0;
-    min-width: 0;
-    width: 100%;
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    transition: opacity 0.12s ease;
-    z-index: 1;
+    transition: none; /* ← HARD CUT */
   }
 
   .gallery.is-fade .slide.is-active {
@@ -263,32 +190,8 @@ a {
   }
 }
 
-@media (min-width: 900px) {
-  .archive-grid {
-    gap: 42px;
-  }
-}
-
-@media (max-width: 700px) {
-  .header-inner {
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-
-  .header-center {
-    text-align: left;
-  }
-
-  .header-right {
-    justify-content: flex-start;
-  }
-}
-
+/* MOBILE */
 @media (max-width: 480px) {
-  .page {
-    padding: 18px 14px 42px;
-  }
-
   .gallery {
     cursor: auto;
   }
@@ -302,41 +205,9 @@ a {
   }
 
   .gallery .slide {
-    flex: 0 0 100%;
-    min-width: 100%;
-    width: 100%;
     position: relative;
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
-    transition: none;
-  }
-
-  .gallery .frame {
-    width: 100%;
-    min-height: auto;
-    padding: 0 10px;
-    display: flex;
-    align-items: flex-end;
-  }
-
-  .gallery .frame img {
-    width: auto;
-    height: auto;
-    max-width: 100%;
-    max-height: 84vh;
-    margin-bottom: 0;
-  }
-
-  .gallery .caption {
-    width: 100%;
-    margin-top: 2px;
-    text-align: left;
-    align-items: flex-start;
-    font-size: 9px;
-  }
-
-  .archive-grid .item:last-child img {
-    margin-bottom: 20px;
   }
 }
