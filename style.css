@@ -305,11 +305,13 @@ a {
     position: relative;
   }
 
+  /* base slide */
   .gallery .slide {
-    transition: opacity 0.19s linear;
-    transition-delay: 0.02s;
+    transition: opacity 0.08s cubic-bezier(0.4, 0, 1, 1);
+    will-change: opacity, filter;
   }
 
+  /* inactive slides */
   .gallery .slide:not(.is-active) {
     position: absolute;
     inset: 0;
@@ -317,9 +319,33 @@ a {
     pointer-events: none;
   }
 
+  /* active slide */
   .gallery .slide.is-active {
     position: relative;
     opacity: 1;
     z-index: 2;
+
+    /* slight contrast boost = photographic feel */
+    filter: brightness(1.05) contrast(1.02);
+  }
+
+  /* FLASH BURST */
+  .gallery.flash .slide.is-active {
+    animation: flashExposure 0.18s ease-out;
+  }
+
+  @keyframes flashExposure {
+    0% {
+      opacity: 0;
+      filter: brightness(2.2) contrast(1.1);
+    }
+    40% {
+      opacity: 1;
+      filter: brightness(1.4);
+    }
+    100% {
+      opacity: 1;
+      filter: brightness(1.05);
+    }
   }
 }
