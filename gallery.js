@@ -5,23 +5,13 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   const track = gallery.querySelector(".gallery-track");
   if (!track) return;
 
-  track.querySelectorAll(".is-clone").forEach((el) => el.remove());
-
-  const realSlides = Array.from(track.querySelectorAll(".slide"));
-  const realCount = realSlides.length;
+  const originalSlides = Array.from(track.querySelectorAll(".slide"));
+  const realCount = originalSlides.length;
   if (realCount <= 1) return;
 
-  const firstClone = realSlides[0].cloneNode(true);
-  const lastClone = realSlides[realCount - 1].cloneNode(true);
-  firstClone.classList.add("is-clone");
-  lastClone.classList.add("is-clone");
-
-  track.appendChild(firstClone);
-  track.insertBefore(lastClone, realSlides[0]);
-
-  let slides = Array.from(track.querySelectorAll(".slide"));
-
+  let slides = [];
   let currentIndex = 1;
+
   let currentTranslate = 0;
   let targetTranslate = 0;
 
@@ -53,7 +43,6 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   }
 
   function applyTransform() {
-    if (isDesktop()) return;
     track.style.transform = `translate3d(${-currentTranslate}px, 0, 0)`;
   }
 
@@ -100,7 +89,16 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     slide.querySelectorAll("img").forEach(warmImage);
   }
 
-  function warmSlides(centerIndex) {
+  function warmDesktopSlides(realIndex) {
+    const prev = realIndex === 0 ? realCount - 1 : realIndex - 1;
+    const next = realIndex === realCount - 1 ? 0 : realIndex + 1;
+
+    [realIndex, prev, next].forEach((i) => {
+      originalSlides[i]?.querySelectorAll("img").forEach(warmImage);
+    });
+  }
+
+  function warmMobileSlides(centerIndex) {
     warmSlide(centerIndex);
     warmSlide(centerIndex - 1);
     warmSlide(centerIndex + 1);
@@ -111,26 +109,42 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     if (centerIndex === realCount + 1) warmSlide(1);
   }
 
-  function setDesktopActive() {
-    const realActiveIndex =
-      currentIndex === 0 ? realCount - 1 :
-      currentIndex === realCount + 1 ? 0 :
-      currentIndex - 1;
+  function buildMobileLoop() {
+    track.querySelectorAll(".is-clone").forEach((el) => el.remove());
 
-    realSlides.forEach((slide, i) => {
-      slide.classList.toggle("is-active", i === realActiveIndex);
-    });
+    const freshRealSlides = Array.from(track.querySelectorAll(".slide")).filter(
+      (slide) => !slide.classList.contains("is-clone")
+    );
+
+    const firstClone = freshRealSlides[0].cloneNode(true);
+    const lastClone = freshRealSlides[freshRealSlides.length - 1].cloneNode(true);
+
+    firstClone.classList.add("is-clone");
+    lastClone.classList.add("is-clone");
+
+    track.appendChild(firstClone);
+    track.insertBefore(lastClone, freshRealSlides[0]);
+
+    slides = Array.from(track.querySelectorAll(".slide"));
   }
 
-  function setIndex(index, immediate = false) {
+  function destroyMobileLoop() {
+    track.querySelectorAll(".is-clone").forEach((el) => el.remove());
+    slides = Array.from(track.querySelectorAll(".slide"));
+  }
+
+  function setDesktopActive(realIndex) {
+    originalSlides.forEach((slide, i) => {
+      slide.classList.toggle("is-active", i === realIndex);
+    });
+
+    warmDesktopSlides(realIndex);
+  }
+
+  function setMobileIndex(index, immediate = false) {
     currentIndex = index;
     targetTranslate = getTranslateForIndex(index);
-    warmSlides(index);
-
-    if (isDesktop()) {
-      setDesktopActive();
-      return;
-    }
+    warmMobileSlides(index);
 
     if (immediate) {
       currentTranslate = targetTranslate;
@@ -140,23 +154,16 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
 
   function instantJumpTo(index) {
     currentIndex = index;
-    targetTranslate = getTranslateForIndex(index);
-    currentTranslate = targetTranslate;
-
-    if (isDesktop()) {
-      setDesktopActive();
-      return;
-    }
-
+    currentTranslate = getTranslateForIndex(index);
+    targetTranslate = currentTranslate;
     applyTransform();
-    warmSlides(index);
+    warmMobileSlides(index);
   }
 
   function goNext() {
     if (isDesktop()) {
       currentIndex = currentIndex >= realCount ? 1 : currentIndex + 1;
-      setDesktopActive();
-      warmSlides(currentIndex);
+      setDesktopActive(currentIndex - 1);
       return;
     }
 
@@ -164,17 +171,16 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
 
     if (currentIndex === realCount) {
       isWrapping = true;
-      setIndex(realCount + 1);
-    } else if (currentIndex < realCount) {
-      setIndex(currentIndex + 1);
+      setMobileIndex(realCount + 1);
+    } else {
+      setMobileIndex(currentIndex + 1);
     }
   }
 
   function goPrev() {
     if (isDesktop()) {
       currentIndex = currentIndex <= 1 ? realCount : currentIndex - 1;
-      setDesktopActive();
-      warmSlides(currentIndex);
+      setDesktopActive(currentIndex - 1);
       return;
     }
 
@@ -182,9 +188,9 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
 
     if (currentIndex === 1) {
       isWrapping = true;
-      setIndex(0);
-    } else if (currentIndex > 1) {
-      setIndex(currentIndex - 1);
+      setMobileIndex(0);
+    } else {
+      setMobileIndex(currentIndex - 1);
     }
   }
 
@@ -258,7 +264,7 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
 
     gallery.classList.add("is-dragging");
     clearDesktopCursor();
-    warmSlides(currentIndex);
+    warmMobileSlides(currentIndex);
   }
 
   function onMove(e) {
@@ -348,7 +354,7 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     const flickVelocity = 0.45;
 
     if (!isDragging) {
-      setIndex(currentIndex);
+      setMobileIndex(currentIndex);
       isDragging = false;
       isScrollingY = false;
       velocityX = 0;
@@ -361,7 +367,7 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
       } else if (dx > threshold || velocityX > flickVelocity) {
         goPrev();
       } else {
-        setIndex(currentIndex);
+        setMobileIndex(currentIndex);
       }
     }
 
@@ -370,19 +376,17 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     velocityX = 0;
   }
 
-  function handleResize() {
-    slides = Array.from(track.querySelectorAll(".slide"));
-
+  function setupMode() {
     if (isDesktop()) {
+      destroyMobileLoop();
       track.style.transform = "";
-      setDesktopActive();
+      currentIndex = Math.min(Math.max(currentIndex, 1), realCount);
+      setDesktopActive(currentIndex - 1);
       clearDesktopCursor();
     } else {
-      instantJumpTo(
-        currentIndex <= 0 ? realCount :
-        currentIndex >= realCount + 1 ? 1 :
-        currentIndex
-      );
+      buildMobileLoop();
+      currentIndex = Math.min(Math.max(currentIndex, 1), realCount);
+      instantJumpTo(currentIndex);
       isWrapping = false;
       clearDesktopCursor();
     }
@@ -405,10 +409,8 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     e.preventDefault();
   });
 
-  window.addEventListener("resize", handleResize);
+  window.addEventListener("resize", setupMode);
 
-  instantJumpTo(1);
-  setDesktopActive();
-  warmSlides(1);
+  setupMode();
   animate();
 });
