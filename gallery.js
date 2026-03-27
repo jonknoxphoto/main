@@ -80,22 +80,16 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   }
 
 function setDesktopActive(realIndex) {
-  gallery.classList.remove("flash");
-
   realSlides.forEach((slide, i) => {
     slide.classList.toggle("is-active", i === realIndex);
   });
 
   warmDesktopSlides(realIndex);
 
+  gallery.classList.remove("flash");
   void gallery.offsetWidth;
   gallery.classList.add("flash");
-  setTimeout(() => {
-    gallery.classList.remove("flash");
-  }, 180);
 }
-    warmDesktopSlides(realIndex);
-  }
 
   function buildMobileLoop() {
     track.querySelectorAll(".is-clone").forEach((el) => el.remove());
