@@ -5,8 +5,8 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   const track = gallery.querySelector(".gallery-track");
   if (!track) return;
 
-  const originalSlides = Array.from(track.querySelectorAll(".slide"));
-  const realCount = originalSlides.length;
+  const realSlides = Array.from(track.querySelectorAll(".slide"));
+  const realCount = realSlides.length;
   if (realCount <= 1) return;
 
   let slides = [];
@@ -19,6 +19,7 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   let isDragging = false;
   let isScrollingY = false;
   let isWrapping = false;
+  let movedOnDesktop = false;
 
   let startX = 0;
   let startY = 0;
@@ -30,20 +31,6 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
 
   function isDesktop() {
     return window.innerWidth > 480;
-  }
-
-  function getTranslateForIndex(index) {
-    const slide = slides[index];
-    if (!slide) return 0;
-
-    const slideCenter = slide.offsetLeft + slide.offsetWidth / 2;
-    const galleryCenter = gallery.clientWidth / 2;
-
-    return slideCenter - galleryCenter;
-  }
-
-  function applyTransform() {
-    track.style.transform = `translate3d(${-currentTranslate}px, 0, 0)`;
   }
 
   function updateDesktopCursor(e) {
@@ -83,47 +70,38 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     }
   }
 
-  function warmSlide(index) {
-    const slide = slides[index];
-    if (!slide) return;
-    slide.querySelectorAll("img").forEach(warmImage);
-  }
-
   function warmDesktopSlides(realIndex) {
-    const prev = realIndex === 0 ? realCount - 1 : realIndex - 1;
-    const next = realIndex === realCount - 1 ? 0 : realIndex + 1;
+    const prev = (realIndex - 1 + realCount) % realCount;
+    const next = (realIndex + 1) % realCount;
 
     [realIndex, prev, next].forEach((i) => {
-      originalSlides[i]?.querySelectorAll("img").forEach(warmImage);
+      realSlides[i]?.querySelectorAll("img").forEach(warmImage);
     });
   }
 
-  function warmMobileSlides(centerIndex) {
-    warmSlide(centerIndex);
-    warmSlide(centerIndex - 1);
-    warmSlide(centerIndex + 1);
+  function setDesktopActive(realIndex) {
+    realSlides.forEach((slide, i) => {
+      slide.classList.toggle("is-active", i === realIndex);
+    });
 
-    if (centerIndex === 1) warmSlide(realCount + 1);
-    if (centerIndex === realCount) warmSlide(0);
-    if (centerIndex === 0) warmSlide(realCount);
-    if (centerIndex === realCount + 1) warmSlide(1);
+    warmDesktopSlides(realIndex);
   }
 
   function buildMobileLoop() {
     track.querySelectorAll(".is-clone").forEach((el) => el.remove());
 
-    const freshRealSlides = Array.from(track.querySelectorAll(".slide")).filter(
+    const freshSlides = Array.from(track.querySelectorAll(".slide")).filter(
       (slide) => !slide.classList.contains("is-clone")
     );
 
-    const firstClone = freshRealSlides[0].cloneNode(true);
-    const lastClone = freshRealSlides[freshRealSlides.length - 1].cloneNode(true);
+    const firstClone = freshSlides[0].cloneNode(true);
+    const lastClone = freshSlides[freshSlides.length - 1].cloneNode(true);
 
     firstClone.classList.add("is-clone");
     lastClone.classList.add("is-clone");
 
     track.appendChild(firstClone);
-    track.insertBefore(lastClone, freshRealSlides[0]);
+    track.insertBefore(lastClone, freshSlides[0]);
 
     slides = Array.from(track.querySelectorAll(".slide"));
   }
@@ -131,14 +109,39 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   function destroyMobileLoop() {
     track.querySelectorAll(".is-clone").forEach((el) => el.remove());
     slides = Array.from(track.querySelectorAll(".slide"));
+    track.style.transform = "";
   }
 
-  function setDesktopActive(realIndex) {
-    originalSlides.forEach((slide, i) => {
-      slide.classList.toggle("is-active", i === realIndex);
-    });
+  function getTranslateForIndex(index) {
+    const slide = slides[index];
+    if (!slide) return 0;
 
-    warmDesktopSlides(realIndex);
+    const slideCenter = slide.offsetLeft + slide.offsetWidth / 2;
+    const galleryCenter = gallery.clientWidth / 2;
+
+    return slideCenter - galleryCenter;
+  }
+
+  function applyTransform() {
+    track.style.transform = `translate3d(${-currentTranslate}px, 0, 0)`;
+  }
+
+  function warmMobileSlide(index) {
+    const slide = slides[index];
+    if (!slide) return;
+
+    slide.querySelectorAll("img").forEach(warmImage);
+  }
+
+  function warmMobileSlides(centerIndex) {
+    warmMobileSlide(centerIndex);
+    warmMobileSlide(centerIndex - 1);
+    warmMobileSlide(centerIndex + 1);
+
+    if (centerIndex === 1) warmMobileSlide(realCount + 1);
+    if (centerIndex === realCount) warmMobileSlide(0);
+    if (centerIndex === 0) warmMobileSlide(realCount);
+    if (centerIndex === realCount + 1) warmMobileSlide(1);
   }
 
   function setMobileIndex(index, immediate = false) {
@@ -172,7 +175,7 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     if (currentIndex === realCount) {
       isWrapping = true;
       setMobileIndex(realCount + 1);
-    } else {
+    } else if (currentIndex < realCount) {
       setMobileIndex(currentIndex + 1);
     }
   }
@@ -189,7 +192,7 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     if (currentIndex === 1) {
       isWrapping = true;
       setMobileIndex(0);
-    } else {
+    } else if (currentIndex > 1) {
       setMobileIndex(currentIndex - 1);
     }
   }
@@ -244,7 +247,10 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   function onStart(e) {
     if (isDesktop()) {
       isPointerDown = true;
+      movedOnDesktop = false;
       clearDesktopCursor();
+      startX = getClientX(e);
+      startY = getClientY(e);
       return;
     }
 
@@ -269,7 +275,18 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
 
   function onMove(e) {
     if (isDesktop()) {
-      if (!isPointerDown) updateDesktopCursor(e);
+      if (!isPointerDown) {
+        updateDesktopCursor(e);
+        return;
+      }
+
+      const x = getClientX(e);
+      const y = getClientY(e);
+
+      if (Math.abs(x - startX) > 6 || Math.abs(y - startY) > 6) {
+        movedOnDesktop = true;
+      }
+
       return;
     }
 
@@ -309,11 +326,11 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
       applyTransform();
 
       if (dx < 0) {
-        warmSlide(currentIndex + 1);
-        if (currentIndex === realCount) warmSlide(realCount + 1);
+        warmMobileSlide(currentIndex + 1);
+        if (currentIndex === realCount) warmMobileSlide(realCount + 1);
       } else if (dx > 0) {
-        warmSlide(currentIndex - 1);
-        if (currentIndex === 1) warmSlide(0);
+        warmMobileSlide(currentIndex - 1);
+        if (currentIndex === 1) warmMobileSlide(0);
       }
     }
   }
@@ -324,7 +341,7 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     if (isDesktop()) {
       isPointerDown = false;
 
-      if (e.clientX !== undefined) {
+      if (!movedOnDesktop && e.clientX !== undefined) {
         const rect = gallery.getBoundingClientRect();
         const clickX = e.clientX - rect.left;
 
@@ -379,7 +396,6 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   function setupMode() {
     if (isDesktop()) {
       destroyMobileLoop();
-      track.style.transform = "";
       currentIndex = Math.min(Math.max(currentIndex, 1), realCount);
       setDesktopActive(currentIndex - 1);
       clearDesktopCursor();
