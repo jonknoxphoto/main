@@ -332,18 +332,27 @@ a {
     animation: flashExposure 0.21s ease-out;
   }
 
-  @keyframes flashExposure {
-    0% {
-      opacity: 0;
-      filter: brightness(3.1);
-    }
-    50% {
-      opacity: 1;
-      filter: brightness(2.2);
-    }
-    100% {
-      opacity: 1;
-      filter: brightness(2.8);
-    }
+@keyframes flashExposure {
+  0% {
+    opacity: 0;
+    filter: brightness(2.8) contrast(1.05);
+  }
+
+  18% {
+    opacity: 1;
+    filter: brightness(2.2) contrast(1.04);
+  }
+
+  45% {
+    filter: brightness(1.35) contrast(1.02);
+  }
+
+  75% {
+    filter: brightness(1.08);
+  }
+
+  100% {
+    opacity: 1;
+    filter: brightness(1);
   }
 }
