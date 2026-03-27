@@ -5,13 +5,23 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   const track = gallery.querySelector(".gallery-track");
   if (!track) return;
 
-  const originalSlides = Array.from(track.querySelectorAll(".slide"));
-  const realCount = originalSlides.length;
+  track.querySelectorAll(".is-clone").forEach((el) => el.remove());
+
+  const realSlides = Array.from(track.querySelectorAll(".slide"));
+  const realCount = realSlides.length;
   if (realCount <= 1) return;
 
-  let slides = [];
-  let currentIndex = 1;
+  const firstClone = realSlides[0].cloneNode(true);
+  const lastClone = realSlides[realCount - 1].cloneNode(true);
+  firstClone.classList.add("is-clone");
+  lastClone.classList.add("is-clone");
 
+  track.appendChild(firstClone);
+  track.insertBefore(lastClone, realSlides[0]);
+
+  let slides = Array.from(track.querySelectorAll(".slide"));
+
+  let currentIndex = 1;
   let currentTranslate = 0;
   let targetTranslate = 0;
 
@@ -19,7 +29,6 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   let isDragging = false;
   let isScrollingY = false;
   let isWrapping = false;
-  let isAnimating = false;
 
   let startX = 0;
   let startY = 0;
@@ -33,10 +42,18 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     return window.innerWidth > 480;
   }
 
-  function getRealSlideIndex(loopIndex) {
-    if (loopIndex === 0) return realCount - 1;
-    if (loopIndex === realCount + 1) return 0;
-    return loopIndex - 1;
+  function getTranslateForIndex(index) {
+    const slide = slides[index];
+    if (!slide) return 0;
+
+    const slideCenter = slide.offsetLeft + slide.offsetWidth / 2;
+    const galleryCenter = gallery.clientWidth / 2;
+
+    return slideCenter - galleryCenter;
+  }
+
+  function applyTransform() {
+    track.style.transform = `translate3d(${-currentTranslate}px, 0, 0)`;
   }
 
   function updateDesktopCursor(e) {
@@ -76,90 +93,27 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     }
   }
 
-  function warmSlide(loopIndex) {
-    const realIndex = getRealSlideIndex(loopIndex);
-    const slide = originalSlides[realIndex];
+  function warmSlide(index) {
+    const slide = slides[index];
     if (!slide) return;
 
     slide.querySelectorAll("img").forEach(warmImage);
   }
 
   function warmSlides(centerIndex) {
+    // warm current + neighbors so they appear during drag, not after snap
     warmSlide(centerIndex);
     warmSlide(centerIndex - 1);
     warmSlide(centerIndex + 1);
+
+    // extra help for loop edges
+    if (centerIndex === 1) warmSlide(realCount + 1);
+    if (centerIndex === realCount) warmSlide(0);
+    if (centerIndex === 0) warmSlide(realCount);
+    if (centerIndex === realCount + 1) warmSlide(1);
   }
 
-  function getTranslateForIndex(index) {
-    const slide = slides[index];
-    if (!slide) return 0;
-
-    const slideCenter = slide.offsetLeft + slide.offsetWidth / 2;
-    const galleryCenter = gallery.clientWidth / 2;
-
-    return slideCenter - galleryCenter;
-  }
-
-  function applyTransform() {
-    track.style.transform = `translate3d(${-currentTranslate}px, 0, 0)`;
-  }
-
-  function buildMobileLoop() {
-    track.querySelectorAll(".is-clone").forEach((el) => el.remove());
-    gallery.classList.remove("desktop-fade");
-
-    const freshRealSlides = Array.from(track.querySelectorAll(".slide")).filter(
-      (slide) => !slide.classList.contains("is-clone")
-    );
-
-    if (freshRealSlides.length <= 1) {
-      slides = freshRealSlides;
-      return;
-    }
-
-    const firstClone = freshRealSlides[0].cloneNode(true);
-    const lastClone = freshRealSlides[freshRealSlides.length - 1].cloneNode(true);
-    firstClone.classList.add("is-clone");
-    lastClone.classList.add("is-clone");
-
-    track.appendChild(firstClone);
-    track.insertBefore(lastClone, freshRealSlides[0]);
-
-    slides = Array.from(track.querySelectorAll(".slide"));
-  }
-
-  function destroyMobileLoop() {
-    track.querySelectorAll(".is-clone").forEach((el) => el.remove());
-    slides = Array.from(track.querySelectorAll(".slide"));
-    track.style.transform = "";
-  }
-
-  function updateDesktopActive() {
-    const activeRealIndex = getRealSlideIndex(currentIndex);
-
-    originalSlides.forEach((slide, i) => {
-      slide.classList.toggle("is-active", i === activeRealIndex);
-    });
-
-    warmSlides(currentIndex);
-  }
-
-  function setDesktopIndex(index) {
-    if (isAnimating) return;
-
-    if (index < 1) index = realCount;
-    if (index > realCount) index = 1;
-
-    currentIndex = index;
-    isAnimating = true;
-    updateDesktopActive();
-
-    window.setTimeout(() => {
-      isAnimating = false;
-    }, 120);
-  }
-
-  function setMobileIndex(index, immediate = false) {
+  function setIndex(index, immediate = false) {
     currentIndex = index;
     targetTranslate = getTranslateForIndex(index);
     warmSlides(index);
@@ -179,34 +133,24 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   }
 
   function goNext() {
-    if (isDesktop()) {
-      setDesktopIndex(currentIndex + 1);
-      return;
-    }
-
     if (isWrapping) return;
 
     if (currentIndex === realCount) {
       isWrapping = true;
-      setMobileIndex(realCount + 1);
+      setIndex(realCount + 1);
     } else if (currentIndex < realCount) {
-      setMobileIndex(currentIndex + 1);
+      setIndex(currentIndex + 1);
     }
   }
 
   function goPrev() {
-    if (isDesktop()) {
-      setDesktopIndex(currentIndex - 1);
-      return;
-    }
-
     if (isWrapping) return;
 
     if (currentIndex === 1) {
       isWrapping = true;
-      setMobileIndex(0);
+      setIndex(0);
     } else if (currentIndex > 1) {
-      setMobileIndex(currentIndex - 1);
+      setIndex(currentIndex - 1);
     }
   }
 
@@ -227,7 +171,7 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   }
 
   function animate() {
-    if (!isDesktop() && !isDragging) {
+    if (!isDragging) {
       currentTranslate += (targetTranslate - currentTranslate) * 0.14;
 
       if (Math.abs(targetTranslate - currentTranslate) < 0.35) {
@@ -258,14 +202,6 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   }
 
   function onStart(e) {
-    if (isDesktop()) {
-      isPointerDown = true;
-      isDragging = false;
-      isScrollingY = false;
-      clearDesktopCursor();
-      return;
-    }
-
     if (isWrapping) return;
 
     isPointerDown = true;
@@ -282,17 +218,12 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
 
     gallery.classList.add("is-dragging");
     clearDesktopCursor();
+
+    // preload neighbors right when interaction starts
     warmSlides(currentIndex);
   }
 
   function onMove(e) {
-    if (isDesktop()) {
-      if (!isPointerDown) {
-        updateDesktopCursor(e);
-      }
-      return;
-    }
-
     if (!isPointerDown) {
       updateDesktopCursor(e);
       return;
@@ -322,41 +253,27 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
       const dt = now - lastMoveTime || 1;
 
       velocityX = (x - lastMoveX) / dt;
+
       lastMoveX = x;
       lastMoveTime = now;
 
-      currentTranslate = startTranslate - dx * 0.92;
+      const dragResistance = isDesktop() ? 1 : 0.92;
+      currentTranslate = startTranslate - dx * dragResistance;
       applyTransform();
 
+      // while dragging, preload the direction you're heading toward
       if (dx < 0) {
         warmSlide(currentIndex + 1);
+        if (currentIndex === realCount) warmSlide(realCount + 1);
       } else if (dx > 0) {
         warmSlide(currentIndex - 1);
+        if (currentIndex === 1) warmSlide(0);
       }
     }
   }
 
   function onEnd(e) {
     if (!isPointerDown) return;
-
-    if (isDesktop()) {
-      isPointerDown = false;
-
-      if (e.clientX !== undefined) {
-        const rect = gallery.getBoundingClientRect();
-        const clickX = e.clientX - rect.left;
-
-        if (clickX > rect.width / 2) {
-          goNext();
-        } else {
-          goPrev();
-        }
-
-        updateDesktopCursor(e);
-      }
-
-      return;
-    }
 
     isPointerDown = false;
     gallery.classList.remove("is-dragging");
@@ -368,11 +285,25 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     }
 
     const dx = getClientX(e) - startX;
-    const threshold = gallery.clientWidth * 0.1;
+    const threshold = gallery.clientWidth * (isDesktop() ? 0.12 : 0.1);
     const flickVelocity = 0.45;
 
     if (!isDragging) {
-      setMobileIndex(currentIndex);
+      if (isDesktop() && e.clientX !== undefined && !isWrapping) {
+        const rect = gallery.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+
+        if (clickX > rect.width / 2) {
+          goNext();
+        } else {
+          goPrev();
+        }
+
+        updateDesktopCursor(e);
+      } else {
+        setIndex(currentIndex);
+      }
+
       isDragging = false;
       isScrollingY = false;
       velocityX = 0;
@@ -385,32 +316,13 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
       } else if (dx > threshold || velocityX > flickVelocity) {
         goPrev();
       } else {
-        setMobileIndex(currentIndex);
+        setIndex(currentIndex);
       }
     }
 
     isDragging = false;
     isScrollingY = false;
     velocityX = 0;
-  }
-
-  function setupMode() {
-    if (isDesktop()) {
-      destroyMobileLoop();
-      gallery.classList.add("desktop-fade");
-
-      currentIndex = Math.min(Math.max(currentIndex, 1), realCount);
-      updateDesktopActive();
-      clearDesktopCursor();
-    } else {
-      buildMobileLoop();
-      gallery.classList.remove("desktop-fade");
-
-      currentIndex = Math.min(Math.max(currentIndex, 1), realCount);
-      instantJumpTo(currentIndex);
-      isWrapping = false;
-      clearDesktopCursor();
-    }
   }
 
   gallery.addEventListener("mouseenter", updateDesktopCursor);
@@ -431,10 +343,19 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   });
 
   window.addEventListener("resize", () => {
-    setupMode();
+    slides = Array.from(track.querySelectorAll(".slide"));
+    instantJumpTo(
+      currentIndex <= 0 ? realCount :
+      currentIndex >= realCount + 1 ? 1 :
+      currentIndex
+    );
+
+    isWrapping = false;
+
+    if (!isDesktop()) clearDesktopCursor();
   });
 
-  setupMode();
+  instantJumpTo(1);
   warmSlides(1);
   animate();
 });
