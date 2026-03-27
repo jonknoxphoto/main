@@ -29,7 +29,6 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   let isDragging = false;
   let isScrollingY = false;
   let isWrapping = false;
-  let isDesktopTransitioning = false;
 
   let startX = 0;
   let startY = 0;
@@ -59,7 +58,7 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   }
 
   function updateDesktopCursor(e) {
-    if (!isDesktop() || isPointerDown || e.clientX === undefined) return;
+    if (!isDesktop() || e.clientX === undefined) return;
 
     const rect = gallery.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -138,32 +137,41 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     warmSlides(index);
   }
 
-  function desktopGoTo(index) {
-    if (isDesktopTransitioning) return;
-    isDesktopTransitioning = true;
-
-    currentIndex = index;
-    setFadeActive(index);
-
-    setTimeout(() => {
-      if (currentIndex === 0) currentIndex = realCount;
-      if (currentIndex === realCount + 1) currentIndex = 1;
-      setFadeActive(currentIndex);
-      isDesktopTransitioning = false;
-    }, 70);
+  function desktopNormalize() {
+    if (currentIndex === 0) currentIndex = realCount;
+    if (currentIndex === realCount + 1) currentIndex = 1;
   }
 
-  function goNext() {
-    if (isWrapping || isDesktopTransitioning) return;
-
-    if (isDesktop()) {
-      if (currentIndex === realCount) {
-        desktopGoTo(realCount + 1);
-      } else if (currentIndex < realCount) {
-        desktopGoTo(currentIndex + 1);
-      }
-      return;
+  function goNextDesktop() {
+    if (currentIndex === realCount) {
+      currentIndex = realCount + 1;
+      setFadeActive(currentIndex);
+      setTimeout(() => {
+        desktopNormalize();
+        setFadeActive(currentIndex);
+      }, 60);
+    } else {
+      currentIndex += 1;
+      setFadeActive(currentIndex);
     }
+  }
+
+  function goPrevDesktop() {
+    if (currentIndex === 1) {
+      currentIndex = 0;
+      setFadeActive(currentIndex);
+      setTimeout(() => {
+        desktopNormalize();
+        setFadeActive(currentIndex);
+      }, 60);
+    } else {
+      currentIndex -= 1;
+      setFadeActive(currentIndex);
+    }
+  }
+
+  function goNextMobile() {
+    if (isWrapping) return;
 
     if (currentIndex === realCount) {
       isWrapping = true;
@@ -173,17 +181,8 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     }
   }
 
-  function goPrev() {
-    if (isWrapping || isDesktopTransitioning) return;
-
-    if (isDesktop()) {
-      if (currentIndex === 1) {
-        desktopGoTo(0);
-      } else if (currentIndex > 1) {
-        desktopGoTo(currentIndex - 1);
-      }
-      return;
-    }
+  function goPrevMobile() {
+    if (isWrapping) return;
 
     if (currentIndex === 1) {
       isWrapping = true;
@@ -210,7 +209,7 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   }
 
   function animate() {
-    if (!isDragging && !isDesktop()) {
+    if (!isDesktop() && !isDragging) {
       currentTranslate += (targetTranslate - currentTranslate) * 0.14;
 
       if (Math.abs(targetTranslate - currentTranslate) < 0.35) {
@@ -257,13 +256,12 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     velocityX = 0;
 
     gallery.classList.add("is-dragging");
-    clearDesktopCursor();
     warmSlides(currentIndex);
   }
 
   function onMove(e) {
     if (isDesktop()) {
-      if (!isPointerDown) updateDesktopCursor(e);
+      if (e.clientX !== undefined) updateDesktopCursor(e);
       return;
     }
 
@@ -310,19 +308,7 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   }
 
   function onEnd(e) {
-    if (isDesktop()) {
-      if (e && e.clientX !== undefined && !isDesktopTransitioning) {
-        const rect = gallery.getBoundingClientRect();
-        const clickX = e.clientX - rect.left;
-
-        if (clickX > rect.width / 2) goNext();
-        else goPrev();
-
-        updateDesktopCursor(e);
-      }
-      return;
-    }
-
+    if (isDesktop()) return;
     if (!isPointerDown) return;
 
     isPointerDown = false;
@@ -348,9 +334,9 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
 
     if (!isWrapping) {
       if (dx < -threshold || velocityX < -flickVelocity) {
-        goNext();
+        goNextMobile();
       } else if (dx > threshold || velocityX > flickVelocity) {
-        goPrev();
+        goPrevMobile();
       } else {
         setIndex(currentIndex);
       }
@@ -366,19 +352,25 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
 
     if (isDesktop()) {
       gallery.classList.add("desktop-fade");
-      track.style.transform = "none";
-      setFadeActive(
+      currentIndex =
         currentIndex <= 0 ? realCount :
         currentIndex >= realCount + 1 ? 1 :
-        currentIndex
-      );
+        currentIndex;
+
+      track.style.transform = "none";
+      setFadeActive(currentIndex);
+      isPointerDown = false;
+      isDragging = false;
+      isScrollingY = false;
+      isWrapping = false;
     } else {
       gallery.classList.remove("desktop-fade");
-      instantJumpTo(
+      currentIndex =
         currentIndex <= 0 ? realCount :
         currentIndex >= realCount + 1 ? 1 :
-        currentIndex
-      );
+        currentIndex;
+
+      instantJumpTo(currentIndex);
       isWrapping = false;
       clearDesktopCursor();
     }
@@ -387,6 +379,21 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   gallery.addEventListener("mouseenter", updateDesktopCursor);
   gallery.addEventListener("mousemove", updateDesktopCursor);
   gallery.addEventListener("mouseleave", clearDesktopCursor);
+
+  gallery.addEventListener("click", (e) => {
+    if (!isDesktop()) return;
+
+    const rect = gallery.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+
+    if (clickX > rect.width / 2) {
+      goNextDesktop();
+    } else {
+      goPrevDesktop();
+    }
+
+    updateDesktopCursor(e);
+  });
 
   gallery.addEventListener("mousedown", onStart);
   window.addEventListener("mousemove", onMove);
@@ -404,6 +411,6 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
   window.addEventListener("resize", syncMode);
 
   syncMode();
-  warmSlides(1);
+  warmSlides(currentIndex);
   animate();
 });
