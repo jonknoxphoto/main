@@ -328,27 +328,23 @@ a {
   }
 
   /* FLASH EFFECT (simple + reliable) */
-  .gallery.flash .slide.is-active {
-    animation: flashExposure 0.21s ease-out;
-  }
+.gallery.flash .slide.is-active {
+  animation: flashExposure 0.11s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
 
 @keyframes flashExposure {
   0% {
     opacity: 0;
-    filter: brightness(2.8) contrast(1.05);
+    filter: brightness(1.75) contrast(1.03);
   }
 
-  18% {
+  12% {
     opacity: 1;
-    filter: brightness(2.2) contrast(1.04);
+    filter: brightness(1.38) contrast(1.02);
   }
 
-  45% {
-    filter: brightness(1.35) contrast(1.02);
-  }
-
-  75% {
-    filter: brightness(1.08);
+  32% {
+    filter: brightness(1.12) contrast(1.01);
   }
 
   100% {
