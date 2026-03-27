@@ -300,4 +300,29 @@ a {
   }
 }
 
+@media (min-width: 481px) {
+  .gallery-track {
+    position: relative;
+  }
+
+  .gallery .slide {
+    transition: opacity 0.08s linear, visibility 0.08s linear;
+  }
+
+  .gallery .slide:not(.is-active) {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
+  .gallery .slide.is-active {
+    position: relative;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    z-index: 2;
+  }
+}
 
