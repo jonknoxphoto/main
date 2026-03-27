@@ -79,11 +79,21 @@ document.querySelectorAll(".gallery").forEach((gallery) => {
     });
   }
 
-  function setDesktopActive(realIndex) {
-    realSlides.forEach((slide, i) => {
-      slide.classList.toggle("is-active", i === realIndex);
-    });
+function setDesktopActive(realIndex) {
+  gallery.classList.remove("flash");
 
+  realSlides.forEach((slide, i) => {
+    slide.classList.toggle("is-active", i === realIndex);
+  });
+
+  warmDesktopSlides(realIndex);
+
+  void gallery.offsetWidth;
+  gallery.classList.add("flash");
+  setTimeout(() => {
+    gallery.classList.remove("flash");
+  }, 180);
+}
     warmDesktopSlides(realIndex);
   }
 
