@@ -303,6 +303,7 @@ a {
 @media (min-width: 481px) {
   .gallery {
     position: relative;
+    overflow: hidden;
   }
 
   .gallery-track {
@@ -325,26 +326,7 @@ a {
     position: relative;
     opacity: 1;
     z-index: 2;
-    filter: brightness(1.05) contrast(1.02);
-  }
-
-  .gallery.flash .slide.is-active {
-    animation: flashExposure 0.18s ease-out;
-  }
-
-  @keyframes flashExposure {
-    0% {
-      opacity: 0;
-      filter: brightness(2.2) contrast(1.1);
-    }
-    40% {
-      opacity: 1;
-      filter: brightness(1.4);
-    }
-    100% {
-      opacity: 1;
-      filter: brightness(1.05);
-    }
+    filter: brightness(1.02) contrast(1.01);
   }
 
   .gallery::before {
@@ -354,23 +336,26 @@ a {
     background: #fff;
     opacity: 0;
     pointer-events: none;
-    z-index: 3;
-    mix-blend-mode: screen;
+    z-index: 20;
   }
 
   .gallery.flash::before {
-    animation: flashWhite 0.12s ease-out;
+    animation: flashWhite 0.16s ease-out forwards;
+  }
+
+  .gallery.flash .slide.is-active .frame img {
+    animation: flashExposure 0.18s ease-out forwards;
   }
 
   @keyframes flashWhite {
-    0% {
-      opacity: 1;
-    }
-    60% {
-      opacity: 0.35;
-    }
-    100% {
-      opacity: 0;
-    }
+    0% { opacity: 0.75; }
+    35% { opacity: 0.22; }
+    100% { opacity: 0; }
+  }
+
+  @keyframes flashExposure {
+    0% { filter: brightness(1.9) contrast(1.08); }
+    40% { filter: brightness(1.25) contrast(1.03); }
+    100% { filter: brightness(1) contrast(1); }
   }
 }
