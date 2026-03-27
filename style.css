@@ -306,7 +306,8 @@ a {
   }
 
   .gallery .slide {
-    transition: opacity 0.08s linear;
+    transition: opacity 0.19s linear;
+    transition-delay: 0.02s;
   }
 
   .gallery .slide:not(.is-active) {
