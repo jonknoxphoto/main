@@ -309,10 +309,9 @@ a {
     position: relative;
   }
 
-  .gallery .slide {
-    transition: opacity 0.08s linear;
-    will-change: opacity, filter;
-  }
+.gallery .slide {
+  transition: opacity 0.06s linear;
+}
 
   .gallery .slide:not(.is-active) {
     position: absolute;
@@ -328,27 +327,35 @@ a {
   }
 
   /* FLASH EFFECT (simple + reliable) */
-.gallery.flash .slide.is-active {
-  animation: flashExposure 0.11s cubic-bezier(0.22, 0.61, 0.36, 1);
-}
+@media (min-width: 481px) {
+  .gallery {
+    position: relative;
+    overflow: hidden;
+  }
 
-@keyframes flashExposure {
-  0% {
+  .gallery::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: #fff;
     opacity: 0;
-    filter: brightness(1.75) contrast(1.03);
+    pointer-events: none;
+    z-index: 10;
   }
 
-  12% {
-    opacity: 1;
-    filter: brightness(1.38) contrast(1.02);
+  .gallery.flash::before {
+    animation: flashWhite 0.10s ease-out;
   }
 
-  32% {
-    filter: brightness(1.12) contrast(1.01);
-  }
-
-  100% {
-    opacity: 1;
-    filter: brightness(1);
+  @keyframes flashWhite {
+    0% {
+      opacity: 0.9;
+    }
+    60% {
+      opacity: 0.25;
+    }
+    100% {
+      opacity: 0;
+    }
   }
 }
