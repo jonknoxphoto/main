@@ -227,6 +227,34 @@ a {
   flex-wrap: wrap;
 }
 
+/* desktop only: switch gallery cycling to flash fade */
+@media (min-width: 481px) {
+  .gallery.desktop-fade .gallery-track {
+    display: block;
+    position: relative;
+    transform: none !important;
+    gap: 0;
+  }
+
+  .gallery.desktop-fade .slide {
+    position: absolute;
+    inset: 0;
+    min-width: 0;
+    width: 100%;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.06s linear, visibility 0.06s linear;
+  }
+
+  .gallery.desktop-fade .slide.is-active {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    z-index: 2;
+  }
+}
+
 @media (min-width: 900px) {
   .archive-grid {
     gap: 42px;
@@ -269,6 +297,10 @@ a {
     flex: 0 0 100%;
     min-width: 100%;
     width: 100%;
+    position: relative;
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
   }
 
   .gallery .frame {
