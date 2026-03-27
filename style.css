@@ -344,7 +344,7 @@ a {
   }
 
   .gallery.flash::before {
-    animation: flashWhite 0.10s ease-out;
+    animation: flashWhite 0.30s ease-out;
   }
 
   @keyframes flashWhite {
