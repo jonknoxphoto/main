@@ -329,21 +329,21 @@ a {
 
   /* FLASH EFFECT (simple + reliable) */
   .gallery.flash .slide.is-active {
-    animation: flashExposure 0.16s ease-out;
+    animation: flashExposure 0.36s ease-out;
   }
 
   @keyframes flashExposure {
     0% {
-      opacity: 0;
+      opacity: 10;
       filter: brightness(1.8);
     }
     50% {
       opacity: 1;
-      filter: brightness(1.2);
+      filter: brightness(5.2);
     }
     100% {
       opacity: 1;
-      filter: brightness(1);
+      filter: brightness(10);
     }
   }
 }
