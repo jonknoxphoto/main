@@ -338,18 +338,23 @@ a {
     animation: none;
   }
 
-  /* WHITE FLASH */
-  .gallery::before {
+  .gallery .slide .frame {
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* WHITE FLASH ONLY ON FRAME */
+  .gallery .slide .frame::before {
     content: "";
     position: absolute;
     inset: 0;
     background: #fff;
     opacity: 0;
     pointer-events: none;
-    z-index: 5;
+    z-index: 3;
   }
 
-  .gallery.flash::before {
+  .gallery.flash .slide.is-active .frame::before {
     animation: flashWhite 0.10s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
 
